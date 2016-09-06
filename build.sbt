@@ -1,4 +1,4 @@
-name := """apache-spark-2-scala-starter-template"""
+name := """portfolio-simulation"""
 
 version := "1.0"
 
@@ -10,6 +10,7 @@ libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-sql" % "2.0.0",
   "org.postgresql" % "postgresql" % "9.4.1209.jre7",
   "log4j" % "log4j" % "1.2.17",
+  "joda-time" % "joda-time" % "2.9.4",
   "org.scalatest" %% "scalatest" % "2.2.6" % Test)
 
 javaOptions in (Test, run) ++= Seq("-Dspark.master=local",
