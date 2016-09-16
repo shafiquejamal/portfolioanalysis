@@ -3,7 +3,7 @@ package com.eigenroute.portfolioanalysis
 import java.sql.Timestamp
 
 import org.joda.time.DateTime
-import org.scalatest.{ShouldMatchers, FlatSpec}
+import org.scalatest.{FlatSpec, ShouldMatchers}
 
 class PortfolioManagerUTest extends FlatSpec with ShouldMatchers {
 
@@ -61,11 +61,32 @@ class PortfolioManagerUTest extends FlatSpec with ShouldMatchers {
       ETFDesiredValue(eTFB, 3000d, isToTrade = false),
       ETFDesiredValue(eTFC, 4000d, isToTrade = false),
       ETFDesiredValue(eTFD, 2000d, isToTrade = false)
-                                           )
+    )
+
+    val expectedValueDifferenceOneTrade = Seq(
+      PortfolioValueDifference(eTFA, 1355.88235),
+      PortfolioValueDifference(eTFB, 1711.76471),
+      PortfolioValueDifference(eTFC, -3057.64706),
+      PortfolioValueDifference(eTFD, 0.00000)
+    )
+
+    val expectedValueDifferenceNoTrades = Seq(
+      PortfolioValueDifference(eTFA, 0d),
+      PortfolioValueDifference(eTFB, 0d),
+      PortfolioValueDifference(eTFC, 0d),
+      PortfolioValueDifference(eTFD, 0d)
+    )
+
+    val expectedValueDifferenceAllTrades = Seq(
+      PortfolioValueDifference(eTFA, 1500d),
+      PortfolioValueDifference(eTFB, 2000d),
+      PortfolioValueDifference(eTFC, -3000d),
+      PortfolioValueDifference(eTFD, -500d)
+    )
   }
 
   "The weight difference calculator" should "accurately calculate the weight difference" in {
-    pm.weightDifferenceCalculator(portfolioDesign, portfolioSnapshot).map { portfolioWeightDifference =>
+    pm.weightDifference(portfolioDesign, portfolioSnapshot).map { portfolioWeightDifference =>
       PortfolioWeightDifference(portfolioWeightDifference.eTFCode,
         BigDecimal(portfolioWeightDifference.weightDifference).setScale(5, BigDecimal.RoundingMode.HALF_UP).toDouble)
     } should contain theSameElementsAs weightDifferences
@@ -91,11 +112,26 @@ class PortfolioManagerUTest extends FlatSpec with ShouldMatchers {
     perETFTradingCost: Double,
     accExDiv: Double,
     accCash: Double): Unit = {
-    pm.newDesiredValueCalculator(
+    pm.newDesiredValue(
         portfolioDesign, weightDifferences, portfolioSnapshot, maxAllowedDeviation, perETFTradingCost, accExDiv, accCash
       ).map { dV =>
-      ETFDesiredValue(dV.eTFCode, BigDecimal(dV.value).setScale(5, BigDecimal.RoundingMode.HALF_UP).toDouble, dV.isToTrade)
+        ETFDesiredValue(dV.eTFCode, BigDecimal(dV.value).setScale(5, BigDecimal.RoundingMode.HALF_UP).toDouble, dV.isToTrade)
     } should contain theSameElementsAs expected
+  }
+
+  "The value difference calculator" should "calculate the difference in value as non-zero for ETFs to be traded, and zero " +
+  "for ETFs not to be traded, and should get the signs correct" in new DesiredValueFixture {
+
+    pm.valueDifference(expectedDesiredValuesOneToBeTraded, portfolioSnapshot).map { vDiff =>
+      PortfolioValueDifference(vDiff.eTFCode,
+        BigDecimal(vDiff.valueDifference).setScale(5, BigDecimal.RoundingMode.HALF_UP).toDouble)
+    } should contain theSameElementsAs expectedValueDifferenceOneTrade
+
+    pm.valueDifference(expectedDesiredValuesNoTrades, portfolioSnapshot) should
+      contain theSameElementsAs expectedValueDifferenceNoTrades
+
+    pm.valueDifference(expectedDesiredValuesAllToBeTraded, portfolioSnapshot) should
+      contain theSameElementsAs expectedValueDifferenceAllTrades
   }
 
   "The portfolio value calculator" should "calculate the value of the portfolio using the nav and quantity from the " +

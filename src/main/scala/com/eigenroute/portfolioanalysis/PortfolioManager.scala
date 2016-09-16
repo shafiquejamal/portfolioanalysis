@@ -8,7 +8,7 @@ case class PortfolioValueDifferences()
 
 class PortfolioManager {
 
-  def weightDifferenceCalculator(
+  def weightDifference(
     portfolioDesign: PortfolioDesign,
     portfolioSnapshot: PortfolioSnapshot):Seq[PortfolioWeightDifference] = {
 
@@ -23,7 +23,7 @@ class PortfolioManager {
 
   }
 
-  def newDesiredValueCalculator(
+  def newDesiredValue(
     portfolioDesign: PortfolioDesign,
     weightDifferences: Seq[PortfolioWeightDifference],
     portfolioSnapshot: PortfolioSnapshot,
@@ -61,11 +61,26 @@ class PortfolioManager {
     valueOfETFsToTrade ++ valueOfETFsNotToTrade
   }
 
-  def portfolioValue(portfolioSnapshot: PortfolioSnapshot) = portfolioValueFromETFDatas(portfolioSnapshot.eTFDatas)
+  def valueDifference(
+    desiredValues:Seq[ETFDesiredValue],
+    portfolioSnapshot: PortfolioSnapshot): Seq[PortfolioValueDifference] =
+    desiredValues.map { desiredValue =>
+      if (desiredValue.isToTrade) {
+        val currentValue =
+          portfolioSnapshot.eTFDatas.find(_.eTFCode == desiredValue.eTFCode)
+          .map( eTFData => eTFData.nAV * eTFData.quantity).getOrElse(0d)
+        PortfolioValueDifference(desiredValue.eTFCode, desiredValue.value - currentValue)
+      } else {
+        PortfolioValueDifference(desiredValue.eTFCode, 0)
+      }
+    }
 
-  def portfolioValueFromETFDatas(eTFDatas: Seq[ETFDataPlus]) = eTFDatas.map { eTFData => eTFData.nAV * eTFData.quantity }.sum
+  def portfolioValue(portfolioSnapshot: PortfolioSnapshot): Double = portfolioValueFromETFDatas(portfolioSnapshot.eTFDatas)
 
-  def actualValue(portfolioSnapshot: PortfolioSnapshot, eTFCode: ETFCode) =
+  def portfolioValueFromETFDatas(eTFDatas: Seq[ETFDataPlus]): Double =
+    eTFDatas.map { eTFData => eTFData.nAV * eTFData.quantity }.sum
+
+  def actualValue(portfolioSnapshot: PortfolioSnapshot, eTFCode: ETFCode): Double =
     portfolioSnapshot.eTFDatas.find(_.eTFCode == eTFCode).map(eTFDATA => eTFDATA.nAV * eTFDATA.quantity).getOrElse(0d)
 
 }
