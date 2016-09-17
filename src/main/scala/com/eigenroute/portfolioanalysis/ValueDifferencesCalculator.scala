@@ -1,6 +1,6 @@
 package com.eigenroute.portfolioanalysis
 
-class ValueDifferencesCalculator extends PortfolioValueCalculator {
+class ValueDifferencesCalculator extends PortfolioValueCalculation {
 
   def valueDifferences(
       desiredValues:Seq[ETFDesiredValue],

@@ -1,6 +1,6 @@
 package com.eigenroute.portfolioanalysis
 
-trait PortfolioValueCalculator {
+trait PortfolioValueCalculation {
 
   def portfolioValue(portfolioSnapshot: PortfolioSnapshot): Double = portfolioValueFromETFDatas(portfolioSnapshot.eTFDatas)
 

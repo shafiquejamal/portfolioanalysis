@@ -12,6 +12,7 @@ trait PortfolioFixture {
   val eTFB = ETFCode("BBB")
   val eTFC = ETFCode("CCC")
   val eTFD = ETFCode("DDD")
+  val eTFNotInSnapshot = ETFCode("BAD")
   val eTFASelection = ETFSelection(eTFA, 0.25)
   val eTFBSelection = ETFSelection(eTFB, 0.5)
   val eTFCSelection = ETFSelection(eTFC, 0.1)

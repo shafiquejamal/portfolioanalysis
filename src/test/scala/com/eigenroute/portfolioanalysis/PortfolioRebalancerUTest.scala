@@ -6,14 +6,6 @@ class PortfolioRebalancerUTest extends FlatSpec with ShouldMatchers with Portfol
 
   val pr = new PortfolioRebalancer
 
-  "The portfolio value calculator" should "calculate the value of the portfolio using the nav and quantity from the " +
-  "snapshot" in {
-
-    pr.portfolioValue(portfolioSnapshot) shouldEqual 10000d
-    pr.portfolioValueFromETFDatas(portfolioSnapshot.eTFDatas) shouldEqual 10000d
-
-  }
-
   "The quantity difference calculator" should "calculate the new quantities to be purchased such that as much free cash as" +
   "possible is invested, with the minimum deviation from the desired weights" in new DesiredValueFixture {
 

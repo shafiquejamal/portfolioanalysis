@@ -1,6 +1,6 @@
 package com.eigenroute.portfolioanalysis
 
-class PortfolioRebalancer extends PortfolioValueCalculator {
+class PortfolioRebalancer extends PortfolioValueCalculation {
 
   def firstEstimateQuantitiesToAcquire(
     portfolioDesign: PortfolioDesign,

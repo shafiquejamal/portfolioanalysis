@@ -1,6 +1,6 @@
 package com.eigenroute.portfolioanalysis
 
-class WeightDifferenceCalculator extends PortfolioValueCalculator {
+class WeightDifferenceCalculator extends PortfolioValueCalculation {
 
   def weightDifferences(
      portfolioDesign: PortfolioDesign,

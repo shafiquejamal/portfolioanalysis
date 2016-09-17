@@ -1,6 +1,6 @@
 package com.eigenroute.portfolioanalysis
 
-class NewDesiredValuesCalculator extends PortfolioValueCalculator {
+class NewDesiredValuesCalculator extends PortfolioValueCalculation {
 
   def newDesiredValues(
       portfolioDesign: PortfolioDesign,
