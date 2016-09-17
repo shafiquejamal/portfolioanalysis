@@ -1,11 +1,5 @@
 package com.eigenroute.portfolioanalysis
 
-case class PortfolioValueDifference(eTFCode: ETFCode, valueDifference: Double)
-case class PortfolioWeightDifference(eTFCode: ETFCode, weightDifference: Double)
-case class ETFDesiredValue(eTFCode: ETFCode, value:Double, isToTrade: Boolean)
-case class PorfolioQuanitiesToAcquire(
-            eTFCode: ETFCode, quantityToAcquire:Int, effectivePrice: Double, fractionalQuantity: Double)
-
 class PortfolioRebalancer extends PortfolioValueCalculator {
 
   def valueDifferences(
