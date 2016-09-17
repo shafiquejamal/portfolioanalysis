@@ -5,7 +5,7 @@ import java.sql.Timestamp
 import org.joda.time.DateTime
 import org.scalatest.{FlatSpec, ShouldMatchers}
 
-class PortfolioManagerUTest extends FlatSpec with ShouldMatchers {
+class PortfolioRebalancerUTest extends FlatSpec with ShouldMatchers {
 
   val now = new Timestamp(new DateTime(2016, 1, 1, 1, 1, 1).getMillis)
 
@@ -32,7 +32,7 @@ class PortfolioManagerUTest extends FlatSpec with ShouldMatchers {
      PortfolioWeightDifference(eTFD, -0.05)
   )
 
-  val pm = new PortfolioManager
+  val pm = new PortfolioRebalancer
 
   trait DesiredValueFixture {
     val expectedDesiredValuesOneToBeTraded = Seq(

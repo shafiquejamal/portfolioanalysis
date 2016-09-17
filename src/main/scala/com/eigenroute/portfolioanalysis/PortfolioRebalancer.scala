@@ -6,7 +6,7 @@ case class ETFDesiredValue(eTFCode: ETFCode, value:Double, isToTrade: Boolean)
 
 case class PortfolioValueDifferences()
 
-class PortfolioManager {
+class PortfolioRebalancer {
 
   def weightDifference(
     portfolioDesign: PortfolioDesign,
