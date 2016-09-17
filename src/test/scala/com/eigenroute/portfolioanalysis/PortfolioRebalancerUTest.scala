@@ -6,20 +6,6 @@ class PortfolioRebalancerUTest extends FlatSpec with ShouldMatchers with Portfol
 
   val pr = new PortfolioRebalancer
 
-  "The value difference calculator" should "calculate the difference in value as non-zero for ETFs to be traded, and zero " +
-  "for ETFs not to be traded, and should get the signs correct" in new DesiredValueFixture {
-
-    pr.valueDifferences(expectedDesiredValuesOneToBeTraded, portfolioSnapshot).map { vDiff =>
-      PortfolioValueDifference(vDiff.eTFCode, round(vDiff.valueDifference))
-    } should contain theSameElementsAs expectedValueDifferenceOneTrade
-
-    pr.valueDifferences(expectedDesiredValuesNoTrades, portfolioSnapshot) should
-      contain theSameElementsAs expectedValueDifferenceNoTrades
-
-    pr.valueDifferences(expectedDesiredValuesAllToBeTraded, portfolioSnapshot) should
-      contain theSameElementsAs expectedValueDifferenceAllTrades
-  }
-
   "The portfolio value calculator" should "calculate the value of the portfolio using the nav and quantity from the " +
   "snapshot" in {
 

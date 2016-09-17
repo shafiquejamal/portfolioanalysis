@@ -2,7 +2,7 @@ package com.eigenroute.portfolioanalysis
 
 import org.scalatest._
 
-class NewDesiredValuesCalculatorUTest extends FlatSpec with ShouldMatchers with PortfolioFixture  {
+class NewDesiredValuesCalculatorUTest extends FlatSpec with ShouldMatchers with PortfolioFixture {
 
   "The new desired value calculator" should "calculate the new desired value when the max dev is low but not " +
   "zero" in new DesiredValueFixture {
