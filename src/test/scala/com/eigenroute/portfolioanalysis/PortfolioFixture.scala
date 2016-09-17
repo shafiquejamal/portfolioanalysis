@@ -31,6 +31,8 @@ trait PortfolioFixture {
     PortfolioWeightDifference(eTFD, -0.05)
   )
 
+  def round(double: Double): Double = BigDecimal(double).setScale(5, BigDecimal.RoundingMode.HALF_UP).toDouble
+
   trait DesiredValueFixture {
     val expectedDesiredValuesOneToBeTraded = Seq(
       ETFDesiredValue(eTFA, 2355.88235, isToTrade = true),

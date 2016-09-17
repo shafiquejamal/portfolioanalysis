@@ -1,19 +1,10 @@
 package com.eigenroute.portfolioanalysis
 
-import java.sql.Timestamp
-
-import org.joda.time.DateTime
 import org.scalatest.{FlatSpec, ShouldMatchers}
 
 class PortfolioRebalancerUTest extends FlatSpec with ShouldMatchers with PortfolioFixture {
 
   val pr = new PortfolioRebalancer
-
-  "The weight difference calculator" should "accurately calculate the weight difference" in {
-    pr.weightDifferences(portfolioDesign, portfolioSnapshot).map { portfolioWeightDifference =>
-      PortfolioWeightDifference(portfolioWeightDifference.eTFCode, round(portfolioWeightDifference.weightDifference))
-    } should contain theSameElementsAs weightDifferences
-  }
 
   "The new desired value calculator" should "calculate the new desired value when the max dev is low but not " +
   "zero" in new DesiredValueFixture {
@@ -113,6 +104,4 @@ class PortfolioRebalancerUTest extends FlatSpec with ShouldMatchers with Portfol
     contain theSameElementsAs expectedFirstEstimateQuantities
 
   }
-
-  def round(double: Double): Double = BigDecimal(double).setScale(5, BigDecimal.RoundingMode.HALF_UP).toDouble
 }

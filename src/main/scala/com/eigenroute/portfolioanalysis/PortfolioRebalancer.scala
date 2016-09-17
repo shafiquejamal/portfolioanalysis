@@ -6,22 +6,7 @@ case class ETFDesiredValue(eTFCode: ETFCode, value:Double, isToTrade: Boolean)
 case class PorfolioQuanitiesToAcquire(
             eTFCode: ETFCode, quantityToAcquire:Int, effectivePrice: Double, fractionalQuantity: Double)
 
-class PortfolioRebalancer {
-
-  def weightDifferences(
-    portfolioDesign: PortfolioDesign,
-    portfolioSnapshot: PortfolioSnapshot):Seq[PortfolioWeightDifference] = {
-
-    val portfolioVal = portfolioValue(portfolioSnapshot)
-
-    portfolioDesign.eTFSelections.map { eTFDATA =>
-      val eTFCode = eTFDATA.eTFCode
-      val desiredWeight = eTFDATA.desiredWeight
-      val actualWeight = actualValue(portfolioSnapshot, eTFCode) / portfolioVal
-      PortfolioWeightDifference(eTFCode, desiredWeight - actualWeight)
-    }
-
-  }
+class PortfolioRebalancer extends PortfolioValueCalculator {
 
   def newDesiredValues(
     portfolioDesign: PortfolioDesign,
@@ -95,13 +80,5 @@ class PortfolioRebalancer {
     }
 
   }
-
-  def portfolioValue(portfolioSnapshot: PortfolioSnapshot): Double = portfolioValueFromETFDatas(portfolioSnapshot.eTFDatas)
-
-  def portfolioValueFromETFDatas(eTFDatas: Seq[ETFDataPlus]): Double =
-    eTFDatas.map { eTFData => eTFData.nAV * eTFData.quantity }.sum
-
-  def actualValue(portfolioSnapshot: PortfolioSnapshot, eTFCode: ETFCode): Double =
-    portfolioSnapshot.eTFDatas.find(_.eTFCode == eTFCode).map(eTFDATA => eTFDATA.nAV * eTFDATA.quantity).getOrElse(0d)
 
 }
