@@ -85,4 +85,34 @@ trait PortfolioFixture {
     )
   }
 
+  trait EstimatedQuantitiesToAcquire {
+    val expectedFirstEstimateQuantitiesAllTrades = Seq(
+      PorfolioQuanitiesToAcquire(eTFA, 74, round(20*(1 + 0.0011)), 74.91759),
+      PorfolioQuanitiesToAcquire(eTFB, 66, round(30*(1 + 0.0011)), 66.59341),
+      PorfolioQuanitiesToAcquire(eTFC, -76, round(40/(1 + 0.0011)), -75.0825),
+      PorfolioQuanitiesToAcquire(eTFD, -11, round(50/(1 + 0.0011)), -10.011)
+    )
+
+    val expectedFirstEstimateQuantitiesAllTradesExpensive = Seq(
+      PorfolioQuanitiesToAcquire(eTFA, 74, round(20*(1 + 0.0025)), 74.81297),
+      PorfolioQuanitiesToAcquire(eTFB, 66, round(30*(1 + 0.0025)), 66.50042),
+      PorfolioQuanitiesToAcquire(eTFC, -76, round(40/(1 + 0.0025)), -75.1875),
+      PorfolioQuanitiesToAcquire(eTFD, -11, round(50/(1 + 0.0025)), -10.025)
+    )
+
+    val expectedFirstEstimateQuantitiesOneTrade = Seq(
+      PorfolioQuanitiesToAcquire(eTFA, 67, round(20*(1 + 0.0011)), 67.71963),
+      PorfolioQuanitiesToAcquire(eTFB, 56, round(30*(1 + 0.0011)), 56.99613),
+      PorfolioQuanitiesToAcquire(eTFC, -77, round(40/(1 + 0.0011)), -76.52526),
+      PorfolioQuanitiesToAcquire(eTFD, 0, round(50/(1 + 0.0011)), 0)
+    )
+
+    val expectedFirstEstimateQuantitiesNoTrades = Seq(
+      PorfolioQuanitiesToAcquire(eTFA, 0, round(20/(1 + 0.0011)), 0),
+      PorfolioQuanitiesToAcquire(eTFB, 0, round(30/(1 + 0.0011)), 0),
+      PorfolioQuanitiesToAcquire(eTFC, 0, round(40/(1 + 0.0011)), 0),
+      PorfolioQuanitiesToAcquire(eTFD, 0, round(50/(1 + 0.0011)), 0)
+    )
+  }
+
 }
