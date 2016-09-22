@@ -32,7 +32,7 @@ trait PortfolioFixture {
     PortfolioWeightDifference(eTFD, -0.05)
   )
 
-  def round(double: Double): Double = BigDecimal(double).setScale(5, BigDecimal.RoundingMode.HALF_UP).toDouble
+  def round(double: Double, n: Int = 5): Double = BigDecimal(double).setScale(n, BigDecimal.RoundingMode.HALF_UP).toDouble
 
   trait DesiredValueFixture {
     val expectedDesiredValuesOneToBeTraded = Seq(
@@ -87,32 +87,101 @@ trait PortfolioFixture {
 
   trait EstimatedQuantitiesToAcquire {
     val expectedFirstEstimateQuantitiesAllTrades = Seq(
-      PorfolioQuanitiesToAcquire(eTFA, 74, round(20*(1 + 0.0011)), 74.91759),
-      PorfolioQuanitiesToAcquire(eTFB, 66, round(30*(1 + 0.0011)), 66.59341),
-      PorfolioQuanitiesToAcquire(eTFC, -76, round(40/(1 + 0.0011)), -75.0825),
-      PorfolioQuanitiesToAcquire(eTFD, -11, round(50/(1 + 0.0011)), -10.011)
+      PortfolioQuantityToAcquire(eTFA, 74, round(20 * (1 + 0.0011)), 74.91759),
+      PortfolioQuantityToAcquire(eTFB, 66, round(30 * (1 + 0.0011)), 66.59341),
+      PortfolioQuantityToAcquire(eTFC, -76, round(40 / (1 + 0.0011)), -75.0825),
+      PortfolioQuantityToAcquire(eTFD, -11, round(50 / (1 + 0.0011)), -10.011)
     )
 
     val expectedFirstEstimateQuantitiesAllTradesExpensive = Seq(
-      PorfolioQuanitiesToAcquire(eTFA, 74, round(20*(1 + 0.0025)), 74.81297),
-      PorfolioQuanitiesToAcquire(eTFB, 66, round(30*(1 + 0.0025)), 66.50042),
-      PorfolioQuanitiesToAcquire(eTFC, -76, round(40/(1 + 0.0025)), -75.1875),
-      PorfolioQuanitiesToAcquire(eTFD, -11, round(50/(1 + 0.0025)), -10.025)
+      PortfolioQuantityToAcquire(eTFA, 74, round(20 * (1 + 0.0025)), 74.81297),
+      PortfolioQuantityToAcquire(eTFB, 66, round(30 * (1 + 0.0025)), 66.50042),
+      PortfolioQuantityToAcquire(eTFC, -76, round(40 / (1 + 0.0025)), -75.1875),
+      PortfolioQuantityToAcquire(eTFD, -11, round(50 / (1 + 0.0025)), -10.025)
     )
 
     val expectedFirstEstimateQuantitiesOneTrade = Seq(
-      PorfolioQuanitiesToAcquire(eTFA, 67, round(20*(1 + 0.0011)), 67.71963),
-      PorfolioQuanitiesToAcquire(eTFB, 56, round(30*(1 + 0.0011)), 56.99613),
-      PorfolioQuanitiesToAcquire(eTFC, -77, round(40/(1 + 0.0011)), -76.52526),
-      PorfolioQuanitiesToAcquire(eTFD, 0, round(50/(1 + 0.0011)), 0)
+      PortfolioQuantityToAcquire(eTFA, 67, round(20 * (1 + 0.0011)), 67.71963),
+      PortfolioQuantityToAcquire(eTFB, 56, round(30 * (1 + 0.0011)), 56.99613),
+      PortfolioQuantityToAcquire(eTFC, -77, round(40 / (1 + 0.0011)), -76.52526),
+      PortfolioQuantityToAcquire(eTFD, 0, round(50 / (1 + 0.0011)), 0)
     )
 
     val expectedFirstEstimateQuantitiesNoTrades = Seq(
-      PorfolioQuanitiesToAcquire(eTFA, 0, round(20/(1 + 0.0011)), 0),
-      PorfolioQuanitiesToAcquire(eTFB, 0, round(30/(1 + 0.0011)), 0),
-      PorfolioQuanitiesToAcquire(eTFC, 0, round(40/(1 + 0.0011)), 0),
-      PorfolioQuanitiesToAcquire(eTFD, 0, round(50/(1 + 0.0011)), 0)
+      PortfolioQuantityToAcquire(eTFA, 0, round(20 / (1 + 0.0011)), 0),
+      PortfolioQuantityToAcquire(eTFB, 0, round(30 / (1 + 0.0011)), 0),
+      PortfolioQuantityToAcquire(eTFC, 0, round(40 / (1 + 0.0011)), 0),
+      PortfolioQuantityToAcquire(eTFD, 0, round(50 / (1 + 0.0011)), 0)
     )
   }
 
+  trait AdditionalQuantitiesFixture {
+    val expectedAdditionalQuantitiesAllMatch =
+      Seq(AddnlQty(eTFA, 6), AddnlQty(eTFB, 4), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0))
+
+    val expectedAdditionalQuantitiesFull = Seq(
+      Seq(AddnlQty(eTFA, 6), AddnlQty(eTFB, 4), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
+      Seq(AddnlQty(eTFA, 5), AddnlQty(eTFB, 4), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
+      Seq(AddnlQty(eTFA, 4), AddnlQty(eTFB, 4), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
+      Seq(AddnlQty(eTFA, 3), AddnlQty(eTFB, 4), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
+      Seq(AddnlQty(eTFA, 2), AddnlQty(eTFB, 4), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
+      Seq(AddnlQty(eTFA, 1), AddnlQty(eTFB, 4), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
+      Seq(AddnlQty(eTFA, 0), AddnlQty(eTFB, 4), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
+      Seq(AddnlQty(eTFA, 6), AddnlQty(eTFB, 3), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
+      Seq(AddnlQty(eTFA, 5), AddnlQty(eTFB, 3), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
+      Seq(AddnlQty(eTFA, 4), AddnlQty(eTFB, 3), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
+      Seq(AddnlQty(eTFA, 3), AddnlQty(eTFB, 3), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
+      Seq(AddnlQty(eTFA, 2), AddnlQty(eTFB, 3), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
+      Seq(AddnlQty(eTFA, 1), AddnlQty(eTFB, 3), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
+      Seq(AddnlQty(eTFA, 0), AddnlQty(eTFB, 3), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
+      Seq(AddnlQty(eTFA, 6), AddnlQty(eTFB, 2), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
+      Seq(AddnlQty(eTFA, 5), AddnlQty(eTFB, 2), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
+      Seq(AddnlQty(eTFA, 4), AddnlQty(eTFB, 2), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
+      Seq(AddnlQty(eTFA, 3), AddnlQty(eTFB, 2), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
+      Seq(AddnlQty(eTFA, 2), AddnlQty(eTFB, 2), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
+      Seq(AddnlQty(eTFA, 1), AddnlQty(eTFB, 2), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
+      Seq(AddnlQty(eTFA, 0), AddnlQty(eTFB, 2), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
+      Seq(AddnlQty(eTFA, 6), AddnlQty(eTFB, 1), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
+      Seq(AddnlQty(eTFA, 5), AddnlQty(eTFB, 1), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
+      Seq(AddnlQty(eTFA, 4), AddnlQty(eTFB, 1), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
+      Seq(AddnlQty(eTFA, 3), AddnlQty(eTFB, 1), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
+      Seq(AddnlQty(eTFA, 2), AddnlQty(eTFB, 1), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
+      Seq(AddnlQty(eTFA, 1), AddnlQty(eTFB, 1), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
+      Seq(AddnlQty(eTFA, 0), AddnlQty(eTFB, 1), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
+      Seq(AddnlQty(eTFA, 6), AddnlQty(eTFB, 0), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
+      Seq(AddnlQty(eTFA, 5), AddnlQty(eTFB, 0), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
+      Seq(AddnlQty(eTFA, 4), AddnlQty(eTFB, 0), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
+      Seq(AddnlQty(eTFA, 3), AddnlQty(eTFB, 0), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
+      Seq(AddnlQty(eTFA, 2), AddnlQty(eTFB, 0), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
+      Seq(AddnlQty(eTFA, 1), AddnlQty(eTFB, 0), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
+      Seq(AddnlQty(eTFA, 0), AddnlQty(eTFB, 0), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0))
+    )
+
+    val additionalQuantitiesChosenAllTrades =
+      Seq(AddnlQty(eTFA, 3), AddnlQty(eTFB, 2), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0))
+
+    val additionalQuantitiesChosenOneTrade =
+      Seq(AddnlQty(eTFA, 1), AddnlQty(eTFB, 1), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0))
+
+    val expectedFinalQuantitiesToAcquireAllTrades = Seq(
+      PortfolioQuantityToAcquire(eTFA, 77, round(20 * (1 + 0.0011)), 74.91759),
+      PortfolioQuantityToAcquire(eTFB, 68, round(30 * (1 + 0.0011)), 66.59341),
+      PortfolioQuantityToAcquire(eTFC, -76, round(40 / (1 + 0.0011)), -75.0825),
+      PortfolioQuantityToAcquire(eTFD, -11, round(50 / (1 + 0.0011)), -10.011)
+    )
+
+    val expectedFinalQuantitiesAllTrades = Seq(
+      FinalPortfolioQuantityToHave(eTFA, 127),
+      FinalPortfolioQuantityToHave(eTFB, 168),
+      FinalPortfolioQuantityToHave(eTFC, 24),
+      FinalPortfolioQuantityToHave(eTFD, 29)
+    )
+
+    val expectedFinalQuantitiesOneTrade = Seq(
+      FinalPortfolioQuantityToHave(eTFA, 118),
+      FinalPortfolioQuantityToHave(eTFB, 157),
+      FinalPortfolioQuantityToHave(eTFC, 23),
+      FinalPortfolioQuantityToHave(eTFD, 40)
+    )
+  }
 }

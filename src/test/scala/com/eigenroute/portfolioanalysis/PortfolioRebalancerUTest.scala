@@ -7,65 +7,26 @@ class PortfolioRebalancerUTest extends FlatSpec with ShouldMatchers with Portfol
   val pr = new PortfolioRebalancer
 
   "The max quantities generator" should "calculate the maximum quantity of each ETF that can be purchased with the" +
-  "remaining cash" in new EstimatedQuantitiesToAcquire {
+  "remaining cash" in new EstimatedQuantitiesToAcquire with AdditionalQuantitiesFixture {
 
-    val expectedAllMatch = Seq(AddnlQty(eTFA, 6), AddnlQty(eTFB, 4), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0))
     val firstEstimateQuantitiesAllTradesWithNonMatch = Seq(
-      PorfolioQuanitiesToAcquire(eTFNotInSnapshot, 74, round(20*(1 + 0.0011)), 74.91759),
-      PorfolioQuanitiesToAcquire(eTFB, 66, round(30*(1 + 0.0011)), 66.59341),
-      PorfolioQuanitiesToAcquire(eTFC, -76, round(40/(1 + 0.0011)), -75.0825),
-      PorfolioQuanitiesToAcquire(eTFD, -11, round(50/(1 + 0.0011)), -10.011)
+      PortfolioQuantityToAcquire(eTFNotInSnapshot, 74, round(20 * (1 + 0.0011)), 74.91759),
+      PortfolioQuantityToAcquire(eTFB, 66, round(30 * (1 + 0.0011)), 66.59341),
+      PortfolioQuantityToAcquire(eTFC, -76, round(40 / (1 + 0.0011)), -75.0825),
+      PortfolioQuantityToAcquire(eTFD, -11, round(50 / (1 + 0.0011)), -10.011)
     )
     val expectedOneNotMatched = Seq(AddnlQty(eTFNotInSnapshot, 0), AddnlQty(eTFB, 4), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0))
 
     pr.maxQuantitiesGenerator(expectedFirstEstimateQuantitiesAllTrades, portfolioSnapshot) should
-      contain theSameElementsAs expectedAllMatch
+      contain theSameElementsAs expectedAdditionalQuantitiesAllMatch
     pr.maxQuantitiesGenerator(firstEstimateQuantitiesAllTradesWithNonMatch, portfolioSnapshot) should
       contain theSameElementsAs expectedOneNotMatched
 
   }
 
   "The additional quantities to acquire generator" should "generate and exhaustive list of possible additional " +
-  "quantities" in {
+  "quantities" in new AdditionalQuantitiesFixture {
 
-    val expectedAllMatch = Seq(AddnlQty(eTFA, 6), AddnlQty(eTFB, 4), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0))
-    val expectedFull = Seq(
-      Seq(AddnlQty(eTFA, 6), AddnlQty(eTFB, 4), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 5), AddnlQty(eTFB, 4), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 4), AddnlQty(eTFB, 4), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 3), AddnlQty(eTFB, 4), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 2), AddnlQty(eTFB, 4), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 1), AddnlQty(eTFB, 4), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 0), AddnlQty(eTFB, 4), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 6), AddnlQty(eTFB, 3), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 5), AddnlQty(eTFB, 3), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 4), AddnlQty(eTFB, 3), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 3), AddnlQty(eTFB, 3), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 2), AddnlQty(eTFB, 3), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 1), AddnlQty(eTFB, 3), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 0), AddnlQty(eTFB, 3), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 6), AddnlQty(eTFB, 2), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 5), AddnlQty(eTFB, 2), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 4), AddnlQty(eTFB, 2), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 3), AddnlQty(eTFB, 2), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 2), AddnlQty(eTFB, 2), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 1), AddnlQty(eTFB, 2), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 0), AddnlQty(eTFB, 2), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 6), AddnlQty(eTFB, 1), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 5), AddnlQty(eTFB, 1), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 4), AddnlQty(eTFB, 1), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 3), AddnlQty(eTFB, 1), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 2), AddnlQty(eTFB, 1), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 1), AddnlQty(eTFB, 1), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 0), AddnlQty(eTFB, 1), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 6), AddnlQty(eTFB, 0), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 5), AddnlQty(eTFB, 0), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 4), AddnlQty(eTFB, 0), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 3), AddnlQty(eTFB, 0), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 2), AddnlQty(eTFB, 0), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 1), AddnlQty(eTFB, 0), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 0), AddnlQty(eTFB, 0), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0))
-    )
     val allMatchReverse = Seq(AddnlQty(eTFD, 0), AddnlQty(eTFC, 0), AddnlQty(eTFB, 2), AddnlQty(eTFA, 3))
     val expectedReverse = Seq(
       Seq(AddnlQty(eTFD, 0), AddnlQty(eTFC, 0), AddnlQty(eTFB, 2), AddnlQty(eTFA, 3)),
@@ -82,8 +43,69 @@ class PortfolioRebalancerUTest extends FlatSpec with ShouldMatchers with Portfol
       Seq(AddnlQty(eTFD, 0), AddnlQty(eTFC, 0), AddnlQty(eTFB, 0), AddnlQty(eTFA, 0))
     )
 
-    pr.additionalQuanititiesGenerator(expectedAllMatch) should contain theSameElementsAs expectedFull
+    pr.additionalQuanititiesGenerator(expectedAdditionalQuantitiesAllMatch) should contain theSameElementsAs expectedAdditionalQuantitiesFull
     pr.additionalQuanititiesGenerator(allMatchReverse) should contain theSameElementsAs expectedReverse
+  }
+
+  "The max absolute deviation from desired weights calculator" should "return the maximum deviation from the desired " +
+  "weights of the given quantities to purchase" in new AdditionalQuantitiesFixture {
+
+    round(pr.maxAbsDeviation(
+      portfolioDesign,
+      portfolioSnapshot,
+      PortfolioQuantitiesToAcquire(
+        expectedFinalQuantitiesToAcquireAllTrades))) shouldEqual 0.00485
+
+  }
+
+  "The final quantities chooser" should "choose the additional quantity combination that results in the least, " +
+  "non-negative cash remaining and within that set the least deviation from the desired weights" in
+  new EstimatedQuantitiesToAcquire with AdditionalQuantitiesFixture {
+
+    val expectedChosenAllTrades =
+      FinalPortfolioQuantitiesToHave(expectedFinalQuantitiesAllTrades, 2.11734, 0.00485, additionalQuantitiesChosenAllTrades)
+
+    val expectedChosenOneTrade =
+      FinalPortfolioQuantitiesToHave(expectedFinalQuantitiesOneTrade, 3.23872, 0.05020, additionalQuantitiesChosenOneTrade)
+
+    val actualChosenAllTrades = pr.finalQuantitiesChooser(
+      portfolioDesign,
+      portfolioSnapshot,
+      PortfolioQuantitiesToAcquire(expectedFirstEstimateQuantitiesAllTrades),
+      Seq(additionalQuantitiesChosenAllTrades))
+
+    val actualChosenOneTrade = pr.finalQuantitiesChooser(
+      portfolioDesign,
+      portfolioSnapshot,
+      PortfolioQuantitiesToAcquire(expectedFirstEstimateQuantitiesOneTrade),
+      Seq(additionalQuantitiesChosenOneTrade))
+
+    actualChosenAllTrades.copy(
+      cashRemaining = round(actualChosenAllTrades.cashRemaining, 2),
+      maxActualDeviation = round(actualChosenAllTrades.maxActualDeviation)) shouldEqual
+      expectedChosenAllTrades.copy(cashRemaining = round(expectedChosenAllTrades.cashRemaining, 2))
+
+    actualChosenOneTrade.copy(
+      cashRemaining = round(actualChosenOneTrade.cashRemaining, 2),
+      maxActualDeviation = round(actualChosenOneTrade.maxActualDeviation)) shouldEqual
+      expectedChosenOneTrade.copy(cashRemaining = round(expectedChosenOneTrade.cashRemaining, 2))
+
+    pr.finalQuantitiesChooser(
+      portfolioDesign,
+      portfolioSnapshot,
+      PortfolioQuantitiesToAcquire(expectedFirstEstimateQuantitiesOneTrade),
+      Seq()) shouldEqual FinalPortfolioQuantitiesToHave(portfolioSnapshot.eTFDatas.map { eTFData =>
+          FinalPortfolioQuantityToHave(eTFData.eTFCode, eTFData.quantity.toInt)
+        }, pr.cashRemaining(PortfolioQuantitiesToAcquire(expectedFirstEstimateQuantitiesOneTrade).quantitiesToAcquire), 0, Seq())
+
+  }
+
+  "The cash remaining calculator" should "correctly calculate the cash remaining after trades" in
+  new EstimatedQuantitiesToAcquire {
+    val expected = 53.29385
+    round(pr.
+      cashRemaining(
+        PortfolioQuantitiesToAcquire(expectedFirstEstimateQuantitiesOneTrade).quantitiesToAcquire)) shouldEqual expected
   }
 
 }

@@ -17,15 +17,15 @@ class FirstEstimateQuantitiesToAcquireCalculatorUTest extends FlatSpec with Shou
   }
 
   private def checkFirstEstimateQuantitiesToAcquire(
-    expectedValueDifference: Seq[PortfolioValueDifference],
-    expectedFirstEstimateQuantities: Seq[PorfolioQuanitiesToAcquire],
-    bidAskCost: Double = 0.0011) {
+                                                     expectedValueDifference: Seq[PortfolioValueDifference],
+                                                     expectedFirstEstimateQuantities: Seq[PortfolioQuantityToAcquire],
+                                                     bidAskCost: Double = 0.0011) {
 
     new FirstEstimateQuantitiesToAcquireCalculator()
     .firstEstimateQuantitiesToAcquire(portfolioDesign, portfolioSnapshot, expectedValueDifference, bidAskCost)
     .map { est =>
-      PorfolioQuanitiesToAcquire(
-        est.eTFCode, est.quantityToAcquire, round(est.effectivePrice), round(est.fractionalQuantity) ) } should
+      PortfolioQuantityToAcquire(
+        est.eTFCode, est.quantityToAcquire, round(est.effectivePrice), round(est.fractionalQuantity)) } should
     contain theSameElementsAs expectedFirstEstimateQuantities
 
   }

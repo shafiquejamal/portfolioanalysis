@@ -6,7 +6,7 @@ class FirstEstimateQuantitiesToAcquireCalculator extends PortfolioValueCalculati
       portfolioDesign: PortfolioDesign,
       portfolioSnapshot: PortfolioSnapshot,
       valueDifferences: Seq[PortfolioValueDifference],
-      bidAskCostFractionOfNAV: Double): Seq[PorfolioQuanitiesToAcquire] = {
+      bidAskCostFractionOfNAV: Double): Seq[PortfolioQuantityToAcquire] = {
 
     def price(valueDifference:Double, nAV: Double):Double =
       if (valueDifference > 0)
@@ -18,7 +18,7 @@ class FirstEstimateQuantitiesToAcquireCalculator extends PortfolioValueCalculati
       val nAV: Double = portfolioSnapshot.eTFDatas.find(_.eTFCode == pVD.eTFCode).map(_.nAV).get //TODO: do something about the get
     val effectivePrice: Double = price(pVD.valueDifference, nAV)
       val quantity: Double = pVD.valueDifference / effectivePrice
-      PorfolioQuanitiesToAcquire(pVD.eTFCode, math.floor(quantity).toInt, effectivePrice, quantity)
+      PortfolioQuantityToAcquire(pVD.eTFCode, math.floor(quantity).toInt, effectivePrice, quantity)
     }
   }
 
