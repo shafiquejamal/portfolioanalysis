@@ -4,19 +4,16 @@ import com.eigenroute.portfolioanalysis.rebalancing.{ETFDataPlus, PortfolioDesig
 import org.apache.spark.sql.Dataset
 import org.joda.time.{DateTime, Days}
 
-case class InvestmentPeriod(startDate:DateTime, endDate:DateTime) {
-  require(startDate.isBefore(endDate))
-}
-
 class InvestmentPeriodsCreator(portfolioDesign: PortfolioDesign, ds:Dataset[ETFDataPlus]) {
 
   private val datasets =
     portfolioDesign.eTFSelections.map { selection => ds.filter(_.eTFCode == selection.eTFCode).orderBy("asOfDate") }
-  private val eTFDates = datasets.map(_.collect().toSeq)
-  private val datesForFirstETF = eTFDates.headOption.map{eTFDatas => eTFDatas.map(_.asOfDate)}.toSeq.flatten
-  private val overlappingDates:Seq[DateTime] =
-    eTFDates.foldLeft(datesForFirstETF.map(date => new DateTime(date.getTime))){ case (accumulatedCommonDates, eTFDatas) =>
-    accumulatedCommonDates.intersect(eTFDatas.map( eTFData => new DateTime(eTFData.asOfDate.getTime)))
+  private val eTFDatas = datasets.map(_.collect().toSeq)
+  private val datesForFirstETF: Seq[DateTime] =
+    eTFDatas.headOption.map{eTFDatas => eTFDatas.map( eTFData => new DateTime(eTFData.asOfDate))}.toSeq.flatten
+  private val overlappingDates: Seq[DateTime] =
+    eTFDatas.foldLeft(datesForFirstETF){ case (accumulatedCommonDates, eTFData) =>
+    accumulatedCommonDates.intersect(eTFData.map( eTFData => new DateTime(eTFData.asOfDate.getTime)))
   }.sortBy(_.getMillis)
   val earliestDateForAllETFs:Option[DateTime] = overlappingDates.headOption
   val latestDateForAllETFs:Option[DateTime] = overlappingDates.reverse.headOption
