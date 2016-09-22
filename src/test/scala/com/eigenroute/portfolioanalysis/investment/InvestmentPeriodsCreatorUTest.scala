@@ -45,7 +45,7 @@ class InvestmentPeriodsCreatorUTest extends FlatSpec with ShouldMatchers with Po
   val iPC = new InvestmentPeriodsCreator(portfolioDesign, allDS)
 
   "The investment periods creator" should "create x investment periods of approximately y duration" in {
-    val actualInvestmentPeriods = iPC.create(portfolioDesign, 2)
+    val actualInvestmentPeriods = iPC.create(portfolioDesign, 10)
     val endDates = actualInvestmentPeriods.map(_.endDate)
     val startDates = actualInvestmentPeriods.map(_.startDate)
 
