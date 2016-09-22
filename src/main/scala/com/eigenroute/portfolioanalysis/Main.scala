@@ -1,5 +1,6 @@
 package com.eigenroute.portfolioanalysis
 
+import com.eigenroute.portfolioanalysis.rebalancing.{ETFDataPlus, ETFData, ETFCode}
 import org.apache.spark.sql.{Row, SparkSession}
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._

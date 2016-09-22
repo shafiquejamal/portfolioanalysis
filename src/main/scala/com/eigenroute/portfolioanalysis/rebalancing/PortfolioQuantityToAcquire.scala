@@ -1,10 +1,10 @@
-package com.eigenroute.portfolioanalysis
+package com.eigenroute.portfolioanalysis.rebalancing
 
 case class PortfolioQuantityToAcquire(
-             eTFCode: ETFCode,
-             quantityToAcquire:Int,
-             effectivePrice: Double,
-             fractionalQuantity: Double)
+    eTFCode: ETFCode,
+    quantityToAcquire:Int,
+    effectivePrice: Double,
+    fractionalQuantity: Double)
 
 case class PortfolioQuantitiesToAcquire(quantitiesToAcquire: Seq[PortfolioQuantityToAcquire]) {
 
@@ -22,7 +22,7 @@ case class FinalPortfolioQuantitiesToAcquire(quantities: PortfolioQuantitiesToAc
 case class FinalPortfolioQuantityToHave(eTFCode: ETFCode, quantity: Int)
 
 case class FinalPortfolioQuantitiesToHave(
-             quantitiesToHave: Seq[FinalPortfolioQuantityToHave],
-             cashRemaining: Double,
-             maxActualDeviation: Double,
-             additionalQuantities: Seq[AddnlQty])
+    quantitiesToHave: Seq[FinalPortfolioQuantityToHave],
+    cashRemaining: Double,
+    maxActualDeviation: Double,
+    additionalQuantities: Seq[AddnlQty])

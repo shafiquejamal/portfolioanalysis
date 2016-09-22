@@ -1,4 +1,4 @@
-package com.eigenroute.portfolioanalysis
+package com.eigenroute.portfolioanalysis.rebalancing
 
 class FirstEstimateQuantitiesToAcquireCalculator extends PortfolioValueCalculation {
 
@@ -15,10 +15,10 @@ class FirstEstimateQuantitiesToAcquireCalculator extends PortfolioValueCalculati
         nAV / (1 + bidAskCostFractionOfNAV)
 
     valueDifferences.map { pVD =>
-      val nAV: Double = portfolioSnapshot.eTFDatas.find(_.eTFCode == pVD.eTFCode).map(_.nAV).get //TODO: do something about the get
-    val effectivePrice: Double = price(pVD.valueDifference, nAV)
-      val quantity: Double = pVD.valueDifference / effectivePrice
-      PortfolioQuantityToAcquire(pVD.eTFCode, math.floor(quantity).toInt, effectivePrice, quantity)
+      val maybeNAV = portfolioSnapshot.eTFDatas.find(_.eTFCode == pVD.eTFCode).map(_.nAV)
+      val maybeEffectivePrice = maybeNAV.map(nAV => price(pVD.valueDifference, nAV))
+      val quantity: Double = maybeEffectivePrice map (pVD.valueDifference / _) getOrElse 0d
+      PortfolioQuantityToAcquire(pVD.eTFCode, math.floor(quantity).toInt, maybeEffectivePrice.getOrElse(0d), quantity)
     }
   }
 

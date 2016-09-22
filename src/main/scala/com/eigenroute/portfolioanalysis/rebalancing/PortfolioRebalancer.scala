@@ -1,6 +1,4 @@
-package com.eigenroute.portfolioanalysis
-
-case class AddnlQty(eTFCode: ETFCode, quanitity: Int)
+package com.eigenroute.portfolioanalysis.rebalancing
 
 class PortfolioRebalancer extends PortfolioValueCalculation {
 

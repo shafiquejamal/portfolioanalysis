@@ -1,4 +1,4 @@
-package com.eigenroute.portfolioanalysis
+package com.eigenroute.portfolioanalysis.rebalancing
 
 import org.scalatest.{FlatSpec, ShouldMatchers}
 
