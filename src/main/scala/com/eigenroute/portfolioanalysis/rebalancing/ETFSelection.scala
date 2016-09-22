@@ -1,6 +1,6 @@
 package com.eigenroute.portfolioanalysis.rebalancing
 
-import java.sql.Timestamp
+import java.sql.Date
 
 case class ETFCode(code: String) {
   require(code.length == 3)
@@ -14,10 +14,10 @@ case class PortfolioDesign(eTFSelections: Seq[ETFSelection], tolerance: Double =
   require(math.pow(eTFSelections.map(_.desiredWeight).sum - 1, 2) <= tolerance)
 }
 
-case class ETFData(asOfDate: Timestamp, code: String, xnumber: String, nAV: Double, exDividend: Double)
+case class ETFData(asOfDate: Date, code: String, xnumber: String, nAV: Double, exDividend: Double)
 
 case class ETFDataPlus(
-    asOfDate: Timestamp,
+    asOfDate: Date,
     eTFCode: ETFCode,
     xnumber: String,
     nAV: Double,

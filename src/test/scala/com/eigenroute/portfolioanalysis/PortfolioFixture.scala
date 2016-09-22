@@ -1,12 +1,13 @@
-package com.eigenroute.portfolioanalysis.rebalancing
+package com.eigenroute.portfolioanalysis
 
-import java.sql.Timestamp
+import java.sql.Date
 
+import com.eigenroute.portfolioanalysis.rebalancing._
 import org.joda.time.DateTime
 
 trait PortfolioFixture {
 
-  val now = new Timestamp(new DateTime(2016, 1, 1, 1, 1, 1).getMillis)
+  val now = new Date(new DateTime(2016, 1, 1, 1, 1, 1).getMillis)
 
   val eTFA = ETFCode("AAA")
   val eTFB = ETFCode("BBB")

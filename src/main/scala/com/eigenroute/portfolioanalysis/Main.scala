@@ -1,11 +1,8 @@
 package com.eigenroute.portfolioanalysis
 
-import com.eigenroute.portfolioanalysis.rebalancing.{ETFDataPlus, ETFData, ETFCode}
-import org.apache.spark.sql.{Row, SparkSession}
-import org.apache.spark.SparkContext
-import org.apache.spark.SparkContext._
-import org.apache.spark.SparkConf
-import org.joda.time.DateTime
+import com.eigenroute.portfolioanalysis.rebalancing.{ETFCode, ETFData, ETFDataPlus}
+import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark.sql.SparkSession
 
 object Main {
 
@@ -26,6 +23,7 @@ object Main {
 
     ds.show(false)
 
+    sc.stop()
   }
 
 }

@@ -1,5 +1,6 @@
 package com.eigenroute.portfolioanalysis.rebalancing
 
+import com.eigenroute.portfolioanalysis.PortfolioFixture
 import org.scalatest.{FlatSpec, ShouldMatchers}
 
 class PortfolioQuantitiesToAcquireUTest extends FlatSpec with ShouldMatchers with PortfolioFixture {
