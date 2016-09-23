@@ -15,14 +15,14 @@ class Investment(
     commonDatesDataset:Dataset[ETFDataPlus]) {
 
   val totalNumberOfRebalancingIntervals: Int = lengthInMonths(investmentPeriod) / rebalancingInterval.months
-  val datasetsByInvestmentPeriod: Seq[Dataset[ETFDataPlus]] =
+  val datasetsByRebalancingPeriod: Seq[Dataset[ETFDataPlus]] =
     1.to(totalNumberOfRebalancingIntervals).map { rebalancingIntervalNumber =>
     val monthsToAddToStartOfPeriod = (rebalancingIntervalNumber-1)* rebalancingInterval.months
     val startOfPeriod = investmentPeriod.startDate.plusMonths(monthsToAddToStartOfPeriod)
     val endOfPeriod = startOfPeriod.plusMonths(rebalancingInterval)
     commonDatesDataset.filter(eTFData =>
       eTFData.asOfDate.getTime >= startOfPeriod.getMillis &
-      eTFData.asOfDate.getTime < endOfPeriod.getMillis)
+      eTFData.asOfDate.getTime < endOfPeriod.getMillis).orderBy("asOfDate")
   }.toSeq
 
 }

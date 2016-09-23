@@ -45,8 +45,7 @@ class PortfolioRebalancer extends PortfolioValueCalculation {
         portfolioQuantitiesToAcquire.quantitiesToAcquire.find(_.eTFCode == selection.eTFCode).fold(0)(_.quantityToAcquire)
       val nAV = eTFSnapshot.map(_.nAV).getOrElse(0d)
       val newValue = (quantityToAcquire + eTFSnapshot.map(_.quantity).getOrElse(0d)) * nAV
-      val newWeight =  newValue / newPortfolioValue
-      math.abs(selection.desiredWeight - newWeight)
+      if (newPortfolioValue <= 0) 1d else math.abs(selection.desiredWeight - newValue / newPortfolioValue)
     }.max
 
    }

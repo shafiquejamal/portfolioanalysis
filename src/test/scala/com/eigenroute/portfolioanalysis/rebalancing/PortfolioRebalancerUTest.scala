@@ -44,7 +44,8 @@ class PortfolioRebalancerUTest extends FlatSpec with ShouldMatchers with Portfol
       Seq(AddnlQty(eTFD, 0), AddnlQty(eTFC, 0), AddnlQty(eTFB, 0), AddnlQty(eTFA, 0))
     )
 
-    pr.additionalQuanititiesGenerator(expectedAdditionalQuantitiesAllMatch) should contain theSameElementsAs expectedAdditionalQuantitiesFull
+    pr.additionalQuanititiesGenerator(expectedAdditionalQuantitiesAllMatch) should
+      contain theSameElementsAs expectedAdditionalQuantitiesFull
     pr.additionalQuanititiesGenerator(allMatchReverse) should contain theSameElementsAs expectedReverse
   }
 
@@ -56,6 +57,12 @@ class PortfolioRebalancerUTest extends FlatSpec with ShouldMatchers with Portfol
       portfolioSnapshot,
       PortfolioQuantitiesToAcquire(
         expectedFinalQuantitiesToAcquireAllTrades))) shouldEqual 0.00485
+
+    round(pr.maxAbsDeviation(
+      portfolioDesign,
+      portfolioSnapshotZeroQuantity,
+      PortfolioQuantitiesToAcquire(
+        expectedFinalQuantitiesToAcquireAllTrades))) shouldEqual 1
 
   }
 
@@ -97,7 +104,8 @@ class PortfolioRebalancerUTest extends FlatSpec with ShouldMatchers with Portfol
       PortfolioQuantitiesToAcquire(expectedFirstEstimateQuantitiesOneTrade),
       Seq()) shouldEqual FinalPortfolioQuantitiesToHave(portfolioSnapshot.eTFDatas.map { eTFData =>
           FinalPortfolioQuantityToHave(eTFData.eTFCode, eTFData.quantity.toInt)
-        }, pr.cashRemaining(PortfolioQuantitiesToAcquire(expectedFirstEstimateQuantitiesOneTrade).quantitiesToAcquire), 0, Seq())
+        }, pr.cashRemaining(PortfolioQuantitiesToAcquire(expectedFirstEstimateQuantitiesOneTrade).quantitiesToAcquire),
+          0, Seq())
 
   }
 

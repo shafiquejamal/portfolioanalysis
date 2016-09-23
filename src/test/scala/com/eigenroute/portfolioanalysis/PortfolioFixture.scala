@@ -26,6 +26,7 @@ trait PortfolioFixture {
   val eTFDataPlusC = ETFDataPlus(now, eTFC, "", 40, 0, 100, 0d)
   val eTFDataPlusD = ETFDataPlus(now, eTFD, "", 50, 0, 40, 0d)
   val portfolioSnapshot = PortfolioSnapshot(Seq(eTFDataPlusA, eTFDataPlusB, eTFDataPlusC, eTFDataPlusD))
+  val portfolioSnapshotZeroQuantity = PortfolioSnapshot(portfolioSnapshot.eTFDatas.map(_.copy(quantity = 0d)))
 
   val weightDifferences = Seq(
     PortfolioWeightDifference(eTFA, 0.15),
@@ -63,6 +64,13 @@ trait PortfolioFixture {
       ETFDesiredValue(eTFB, 3000d, isToTrade = false),
       ETFDesiredValue(eTFC, 4000d, isToTrade = false),
       ETFDesiredValue(eTFD, 2000d, isToTrade = false)
+    )
+
+    val expectedDesiredValuesFirstTrade = Seq(
+      ETFDesiredValue(eTFA, 2500d, isToTrade = true),
+      ETFDesiredValue(eTFB, 5000d, isToTrade = true),
+      ETFDesiredValue(eTFC, 1000d, isToTrade = true),
+      ETFDesiredValue(eTFD, 1500d, isToTrade = true)
     )
 
     val expectedValueDifferenceOneTrade = Seq(
@@ -114,6 +122,13 @@ trait PortfolioFixture {
       PortfolioQuantityToAcquire(eTFB, 0, round(30 / (1 + 0.0011)), 0),
       PortfolioQuantityToAcquire(eTFC, 0, round(40 / (1 + 0.0011)), 0),
       PortfolioQuantityToAcquire(eTFD, 0, round(50 / (1 + 0.0011)), 0)
+    )
+
+    val expectedFirstEstimateQuantitiesFirstTrade = Seq(
+       PortfolioQuantityToAcquire(eTFA, 124, round(20 * (1 + 0.0011)), 0),
+       PortfolioQuantityToAcquire(eTFB, 166, round(30 * (1 + 0.0011)), 0),
+       PortfolioQuantityToAcquire(eTFC, 24, round(40 * (1 + 0.0011)), 0),
+       PortfolioQuantityToAcquire(eTFD, 29, round(50 * (1 + 0.0011)), 0)
     )
   }
 
