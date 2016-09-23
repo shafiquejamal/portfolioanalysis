@@ -4,16 +4,24 @@ class PortfolioRebalancer extends PortfolioValueCalculation {
 
   def maxQuantitiesGenerator(
       firstEstimateQuantitiesToAcquire: Seq[PortfolioQuantityToAcquire],
-      portfolioSnapshot: PortfolioSnapshot):Seq[AddnlQty] =
+      portfolioSnapshot: PortfolioSnapshot,
+      accumulatedExDividends: Double,
+      accumulatedCash: Double):Seq[AddnlQty] =
+
     firstEstimateQuantitiesToAcquire.map { fEQTA =>
-      val maybeNAV = portfolioSnapshot.eTFDatas.find( eTFData => eTFData.eTFCode == fEQTA.eTFCode).map(_.nAV)
+      val maybeNAV = portfolioSnapshot.eTFDatas.find(eTFData => eTFData.eTFCode == fEQTA.eTFCode).map(_.nAV)
       val qty = maybeNAV.fold(0) { nAV =>
         if (fEQTA.quantityToAcquire <= 0)
           0
         else
-          math.floor(cashRemaining(firstEstimateQuantitiesToAcquire) / nAV).toInt }
-      AddnlQty(fEQTA.eTFCode, qty)
-    }
+          math
+          .floor(
+            (cashRemaining(firstEstimateQuantitiesToAcquire) +
+             accumulatedExDividends +
+             accumulatedCash) / nAV)
+          .toInt
+      }
+      AddnlQty(fEQTA.eTFCode, qty)}
 
   def additionalQuanititiesGenerator(maxQuantities: Seq[AddnlQty]):Seq[Seq[AddnlQty]] =
     maxQuantities.foldLeft[Seq[Seq[AddnlQty]]](Seq()) { case (acc, maxQ) =>

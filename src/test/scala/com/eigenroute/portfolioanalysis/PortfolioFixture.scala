@@ -143,6 +143,9 @@ trait PortfolioFixture {
     val expectedAdditionalQuantitiesAllMatch =
       Seq(AddnlQty(eTFA, 6), AddnlQty(eTFB, 4), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0))
 
+    val expectedAdditionalQuantitiesFirstTrades =
+      Seq(AddnlQty(eTFA, 5), AddnlQty(eTFB, 3), AddnlQty(eTFC, 2), AddnlQty(eTFD, 2))
+
     val expectedAdditionalQuantitiesFull = Seq(
       Seq(AddnlQty(eTFA, 6), AddnlQty(eTFB, 4), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
       Seq(AddnlQty(eTFA, 5), AddnlQty(eTFB, 4), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),

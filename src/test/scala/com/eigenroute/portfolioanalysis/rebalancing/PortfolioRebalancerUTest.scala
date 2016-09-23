@@ -9,7 +9,6 @@ class PortfolioRebalancerUTest extends FlatSpec with ShouldMatchers with Portfol
 
   "The max quantities generator" should "calculate the maximum quantity of each ETF that can be purchased with the" +
   "remaining cash" in new EstimatedQuantitiesToAcquire with AdditionalQuantitiesFixture {
-
     val firstEstimateQuantitiesAllTradesWithNonMatch = Seq(
       PortfolioQuantityToAcquire(eTFNotInSnapshot, 74, round(20 * (1 + 0.0011)), 74.91759),
       PortfolioQuantityToAcquire(eTFB, 66, round(30 * (1 + 0.0011)), 66.59341),
@@ -18,11 +17,19 @@ class PortfolioRebalancerUTest extends FlatSpec with ShouldMatchers with Portfol
     )
     val expectedOneNotMatched = Seq(AddnlQty(eTFNotInSnapshot, 0), AddnlQty(eTFB, 4), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0))
 
-    pr.maxQuantitiesGenerator(expectedFirstEstimateQuantitiesAllTrades, portfolioSnapshot) should
+    pr.maxQuantitiesGenerator(expectedFirstEstimateQuantitiesAllTrades, portfolioSnapshot, 0d, 2.11734) should
       contain theSameElementsAs expectedAdditionalQuantitiesAllMatch
-    pr.maxQuantitiesGenerator(firstEstimateQuantitiesAllTradesWithNonMatch, portfolioSnapshot) should
+    pr.maxQuantitiesGenerator(expectedFirstEstimateQuantitiesAllTrades, portfolioSnapshot, 2.11734, 0d) should
+      contain theSameElementsAs expectedAdditionalQuantitiesAllMatch
+    pr.maxQuantitiesGenerator(firstEstimateQuantitiesAllTradesWithNonMatch, portfolioSnapshot, 0d, 2.11734) should
       contain theSameElementsAs expectedOneNotMatched
+  }
 
+  it should "calculate the correct max quantities for the first trades" in new EstimatedQuantitiesToAcquire
+  with AdditionalQuantitiesFixture {
+    pr.maxQuantitiesGenerator(
+      expectedFirstEstimateQuantitiesFirstTrades, portfolioSnapshotZeroQuantity, 0d, 10000d) should
+      contain theSameElementsAs expectedAdditionalQuantitiesFirstTrades
   }
 
   "The additional quantities to acquire generator" should "generate and exhaustive list of possible additional " +
