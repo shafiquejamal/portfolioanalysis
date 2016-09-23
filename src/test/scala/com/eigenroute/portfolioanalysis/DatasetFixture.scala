@@ -29,7 +29,7 @@ object DatasetFixture extends PortfolioFixture {
       0.to(maxDaysToAdd).map { daysToAdd =>
         ETFDataPlus(
           new Date(new DateTime(commonStartDate.plusDays(daysToAdd)).getMillis), selection.eTFCode, "1", 0d, 0d, 0d, 0)
-      }.toSeq
+      }.toSeq.reverse
     }
 
   val commonDatesDataset = commonDatesETFData.toDS()
