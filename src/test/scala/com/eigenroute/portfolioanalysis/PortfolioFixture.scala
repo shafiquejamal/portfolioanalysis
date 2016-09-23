@@ -2,6 +2,7 @@ package com.eigenroute.portfolioanalysis
 
 import java.sql.Date
 
+import com.eigenroute.portfolioanalysis.investment.InvestmentPeriod
 import com.eigenroute.portfolioanalysis.rebalancing._
 import org.joda.time.DateTime
 
@@ -185,4 +186,10 @@ trait PortfolioFixture {
       FinalPortfolioQuantityToHave(eTFD, 40)
     )
   }
+
+  trait InvestmentFixture {
+    val startDate = new DateTime(2010, 1, 1, 0, 0, 0)
+    val investmentPeriod = InvestmentPeriod(startDate, startDate.plusYears(3))
+  }
+
 }
