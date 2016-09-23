@@ -2,7 +2,7 @@ package com.eigenroute.portfolioanalysis.rebalancing
 
 class PortfolioRebalancer extends PortfolioValueCalculation {
 
-  def maxQuantitiesGenerator(
+  def maxQuantities(
       firstEstimateQuantitiesToAcquire: Seq[PortfolioQuantityToAcquire],
       portfolioSnapshot: PortfolioSnapshot,
       accumulatedExDividends: Double,
@@ -23,7 +23,7 @@ class PortfolioRebalancer extends PortfolioValueCalculation {
       }
       AddnlQty(fEQTA.eTFCode, qty)}
 
-  def additionalQuanititiesGenerator(maxQuantities: Seq[AddnlQty]):Seq[Seq[AddnlQty]] =
+  def additionalQuantities(maxQuantities: Seq[AddnlQty]):Seq[Seq[AddnlQty]] =
     maxQuantities.foldLeft[Seq[Seq[AddnlQty]]](Seq()) { case (acc, maxQ) =>
       if (acc.isEmpty) {
         (0 to maxQ.quanitity map { qty => Seq(AddnlQty(maxQ.eTFCode, qty)) }).toSeq
@@ -58,21 +58,25 @@ class PortfolioRebalancer extends PortfolioValueCalculation {
 
    }
 
-  def finalQuantitiesChooser(
+  def finalQuantities(
     portfolioDesign: PortfolioDesign,
     portfolioSnapshot: PortfolioSnapshot,
     firstEstimateQuantitiesToAcquire: PortfolioQuantitiesToAcquire,
-    additionalQuantities: Seq[Seq[AddnlQty]]):FinalPortfolioQuantitiesToHave = {
+    additionalQuantities: Seq[Seq[AddnlQty]],
+    accumulatedExDividends: Double,
+    accumulatedCash: Double):FinalPortfolioQuantitiesToHave = {
 
     lazy val finalPortfolioQuantitiesToHaveDefault = portfolioSnapshot.eTFDatas.map { eTFData =>
       FinalPortfolioQuantityToHave(eTFData.eTFCode, eTFData.quantity.toInt)
     }
 
-    val initialCashRemaining = cashRemaining(firstEstimateQuantitiesToAcquire.quantitiesToAcquire)
+    val initialCashRemaining =
+      cashRemaining(firstEstimateQuantitiesToAcquire.quantitiesToAcquire) + accumulatedCash + accumulatedExDividends
 
     additionalQuantities.map { additionalQuantities =>
       val newQuantitiesToAcquire = firstEstimateQuantitiesToAcquire + additionalQuantities
-      val newCashRemaining = cashRemaining(newQuantitiesToAcquire.quantitiesToAcquire)
+      val newCashRemaining =
+        cashRemaining(newQuantitiesToAcquire.quantitiesToAcquire) + accumulatedCash + accumulatedExDividends
       val maxActualDeviation = maxAbsDeviation(portfolioDesign, portfolioSnapshot, newQuantitiesToAcquire)
       val finalPortfolioQuantitiesToHave = additionalQuantities.map { additionalQuantity =>
         val initialQuantity =
