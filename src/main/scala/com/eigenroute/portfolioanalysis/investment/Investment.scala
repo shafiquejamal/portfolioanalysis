@@ -1,8 +1,9 @@
 package com.eigenroute.portfolioanalysis.investment
 
 import com.eigenroute.portfolioanalysis.investment.InvestmentPeriod._
-import com.eigenroute.portfolioanalysis.rebalancing.{ETFDataPlus, PortfolioDesign}
+import com.eigenroute.portfolioanalysis.rebalancing.{PortfolioSnapshot, ETFDataPlus, PortfolioDesign}
 import org.apache.spark.sql.Dataset
+import org.joda.time.DateTime
 
 class Investment(
     investmentPeriod: InvestmentPeriod,

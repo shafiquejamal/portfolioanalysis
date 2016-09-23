@@ -6,15 +6,7 @@ import org.joda.time.{DateTime, Days}
 
 class InvestmentPeriodsCreator(portfolioDesign: PortfolioDesign, ds:Dataset[ETFDataPlus]) {
 
-  private val datasets =
-    portfolioDesign.eTFSelections.map { selection => ds.filter(_.eTFCode == selection.eTFCode).orderBy("asOfDate") }
-  private val eTFDatas = datasets.map(_.collect().toSeq)
-  private val datesForFirstETF: Seq[DateTime] =
-    eTFDatas.headOption.map{eTFDatas => eTFDatas.map( eTFData => new DateTime(eTFData.asOfDate))}.toSeq.flatten
-  private val overlappingDates: Seq[DateTime] =
-    eTFDatas.foldLeft(datesForFirstETF){ case (accumulatedCommonDates, eTFData) =>
-    accumulatedCommonDates.intersect(eTFData.map( eTFData => new DateTime(eTFData.asOfDate.getTime)))
-  }.sortBy(_.getMillis)
+  val overlappingDates = new OverlappingDatesCalculator(portfolioDesign, ds).overlappingDates
   val earliestDateForAllETFs:Option[DateTime] = overlappingDates.headOption
   val latestDateForAllETFs:Option[DateTime] = overlappingDates.reverse.headOption
 
