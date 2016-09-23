@@ -132,10 +132,10 @@ trait PortfolioFixture {
     )
 
     val expectedFirstEstimateQuantitiesFirstTrades = Seq(
-      PortfolioQuantityToAcquire(eTFA, 124, round(20 * (1 + 0.0011)), 0),
-      PortfolioQuantityToAcquire(eTFB, 166, round(30 * (1 + 0.0011)), 0),
-      PortfolioQuantityToAcquire(eTFC, 24, round(40 * (1 + 0.0011)), 0),
-      PortfolioQuantityToAcquire(eTFD, 29, round(50 * (1 + 0.0011)), 0)
+      PortfolioQuantityToAcquire(eTFA, 124, round(20 * (1 + 0.0011)), 124.86265),
+      PortfolioQuantityToAcquire(eTFB, 166, round(30 * (1 + 0.0011)), 166.48353),
+      PortfolioQuantityToAcquire(eTFC, 24, round(40 * (1 + 0.0011)), 24.97253),
+      PortfolioQuantityToAcquire(eTFD, 29, round(50 * (1 + 0.0011)), 29.96704)
     )
   }
 
