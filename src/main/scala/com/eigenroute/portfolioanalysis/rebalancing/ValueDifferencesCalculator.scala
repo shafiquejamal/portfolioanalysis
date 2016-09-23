@@ -14,6 +14,6 @@ class ValueDifferencesCalculator extends PortfolioValueCalculation {
       } else {
         PortfolioValueDifference(desiredValue.eTFCode, 0)
       }
-                      }
+    }
 
 }

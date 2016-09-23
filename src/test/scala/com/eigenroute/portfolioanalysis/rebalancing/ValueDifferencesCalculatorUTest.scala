@@ -21,4 +21,13 @@ class ValueDifferencesCalculatorUTest extends FlatSpec with ShouldMatchers with 
     contain theSameElementsAs expectedValueDifferenceAllTrades
   }
 
+  it should "correclty calculate the desired value difference for the initial trade" in new DesiredValueFixture {
+
+    valueDifferencesCalculator
+    .valueDifferences(expectedDesiredValuesFirstTrades, portfolioSnapshotZeroQuantity).map { vDiff =>
+      PortfolioValueDifference(vDiff.eTFCode, round(vDiff.valueDifference))
+    } should contain theSameElementsAs expectedValueDifferenceFirstTrades
+
+  }
+
 }

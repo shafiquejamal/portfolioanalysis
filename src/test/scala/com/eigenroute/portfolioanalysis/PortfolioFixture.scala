@@ -66,7 +66,7 @@ trait PortfolioFixture {
       ETFDesiredValue(eTFD, 2000d, isToTrade = false)
     )
 
-    val expectedDesiredValuesFirstTrade = Seq(
+    val expectedDesiredValuesFirstTrades = Seq(
       ETFDesiredValue(eTFA, 2500d, isToTrade = true),
       ETFDesiredValue(eTFB, 5000d, isToTrade = true),
       ETFDesiredValue(eTFC, 1000d, isToTrade = true),
@@ -92,6 +92,13 @@ trait PortfolioFixture {
       PortfolioValueDifference(eTFB, 2000d),
       PortfolioValueDifference(eTFC, -3000d),
       PortfolioValueDifference(eTFD, -500d)
+    )
+
+    val expectedValueDifferenceFirstTrades = Seq(
+      PortfolioValueDifference(eTFA, 2500d),
+      PortfolioValueDifference(eTFB, 5000d),
+      PortfolioValueDifference(eTFC, 1000d),
+      PortfolioValueDifference(eTFD, 1500d)
     )
   }
 
@@ -124,11 +131,11 @@ trait PortfolioFixture {
       PortfolioQuantityToAcquire(eTFD, 0, round(50 / (1 + 0.0011)), 0)
     )
 
-    val expectedFirstEstimateQuantitiesFirstTrade = Seq(
-       PortfolioQuantityToAcquire(eTFA, 124, round(20 * (1 + 0.0011)), 0),
-       PortfolioQuantityToAcquire(eTFB, 166, round(30 * (1 + 0.0011)), 0),
-       PortfolioQuantityToAcquire(eTFC, 24, round(40 * (1 + 0.0011)), 0),
-       PortfolioQuantityToAcquire(eTFD, 29, round(50 * (1 + 0.0011)), 0)
+    val expectedFirstEstimateQuantitiesFirstTrades = Seq(
+      PortfolioQuantityToAcquire(eTFA, 124, round(20 * (1 + 0.0011)), 0),
+      PortfolioQuantityToAcquire(eTFB, 166, round(30 * (1 + 0.0011)), 0),
+      PortfolioQuantityToAcquire(eTFC, 24, round(40 * (1 + 0.0011)), 0),
+      PortfolioQuantityToAcquire(eTFD, 29, round(50 * (1 + 0.0011)), 0)
     )
   }
 

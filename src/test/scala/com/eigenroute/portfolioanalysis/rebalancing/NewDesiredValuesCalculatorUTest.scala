@@ -20,7 +20,7 @@ class NewDesiredValuesCalculatorUTest extends FlatSpec with ShouldMatchers with 
   }
 
   it should "calculate the new desired value when quantities of all ETFs are zero" in new DesiredValueFixture {
-    checkNewDesiredValue(0d, expectedDesiredValuesFirstTrade, 10d, 0d, 10040d, portfolioSnapshotZeroQuantity)
+    checkNewDesiredValue(0d, expectedDesiredValuesFirstTrades, 10d, 0d, 10040d, portfolioSnapshotZeroQuantity)
   }
 
   private def checkNewDesiredValue(
