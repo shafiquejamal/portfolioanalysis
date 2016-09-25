@@ -1,13 +1,25 @@
 package com.eigenroute.portfolioanalysis.rebalancing
 
-class FirstEstimateQuantitiesToAcquireCalculator extends PortfolioValueCalculation {
+class FirstEstimateQuantitiesToAcquireCalculator(
+    valueDifferencesCalculator: ValueDifferencesCalculator = new ValueDifferencesCalculator())
+  extends PortfolioValueCalculation {
 
   def firstEstimateQuantitiesToAcquire(
       portfolioDesign: PortfolioDesign,
       portfolioSnapshot: PortfolioSnapshot,
-      valueDifferences: Seq[PortfolioValueDifference],
-      bidAskCostFractionOfNAV: Double): Seq[PortfolioQuantityToAcquire] = {
-
+      bidAskCostFractionOfNAV: Double,
+      maxAllowedDeviation: Double,
+      perETFTradingCost: Double,
+      accumulatedExDividends: Double,
+      accumulatedCash: Double): Seq[PortfolioQuantityToAcquire] = {
+    val valueDifferences =
+      valueDifferencesCalculator.valueDifferences(
+        portfolioDesign,
+        portfolioSnapshot,
+        maxAllowedDeviation,
+        perETFTradingCost,
+        accumulatedExDividends,
+        accumulatedCash)
     def price(valueDifference:Double, nAV: Double):Double =
       if (valueDifference > 0)
         nAV * (1 + bidAskCostFractionOfNAV)
