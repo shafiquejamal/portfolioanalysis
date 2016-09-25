@@ -1,9 +1,8 @@
 package com.eigenroute.portfolioanalysis.investment
 
 import com.eigenroute.portfolioanalysis.investment.InvestmentPeriod._
-import com.eigenroute.portfolioanalysis.rebalancing.{PortfolioSnapshot, ETFDataPlus, PortfolioDesign}
+import com.eigenroute.portfolioanalysis.rebalancing.{ETFDataPlus, PortfolioDesign}
 import org.apache.spark.sql.Dataset
-import org.joda.time.DateTime
 
 class Investment(
     investmentPeriod: InvestmentPeriod,
@@ -16,14 +15,16 @@ class Investment(
     commonDatesDataset:Dataset[ETFDataPlus]) {
 
   val totalNumberOfRebalancingIntervals: Int = lengthInMonths(investmentPeriod) / rebalancingInterval.months
-  val datasetsByRebalancingPeriod: Seq[Dataset[ETFDataPlus]] =
+  val sortedDatasetsSplitByRebalancingPeriod: Seq[Dataset[ETFDataPlus]] =
     1.to(totalNumberOfRebalancingIntervals).map { rebalancingIntervalNumber =>
     val monthsToAddToStartOfPeriod = (rebalancingIntervalNumber-1)* rebalancingInterval.months
     val startOfPeriod = investmentPeriod.startDate.plusMonths(monthsToAddToStartOfPeriod)
     val endOfPeriod = startOfPeriod.plusMonths(rebalancingInterval)
     commonDatesDataset.filter(eTFData =>
       eTFData.asOfDate.getTime >= startOfPeriod.getMillis &
-      eTFData.asOfDate.getTime < endOfPeriod.getMillis).orderBy("asOfDate")
+      eTFData.asOfDate.getTime < endOfPeriod.getMillis)
   }.toSeq
+
+
 
 }

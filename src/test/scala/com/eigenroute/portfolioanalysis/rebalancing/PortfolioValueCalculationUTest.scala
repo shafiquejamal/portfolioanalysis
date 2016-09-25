@@ -12,7 +12,7 @@ class PortfolioValueCalculationUTest
   "The portfolio value calculator" should "calculate the value of the portfolio using the nav and quantity from the " +
   "snapshot" in {
     portfolioValue(portfolioSnapshot) shouldEqual 10000d
-    portfolioValueFromETFDatas(portfolioSnapshot.eTFDatas) shouldEqual 10000d
+    portfolioValueFromETFDatas(portfolioSnapshot.sameDateUniqueCodesETFDatas) shouldEqual 10000d
   }
 
   "The actual value calculator" should "calculate the current value of an ETF in the portfolio" in {

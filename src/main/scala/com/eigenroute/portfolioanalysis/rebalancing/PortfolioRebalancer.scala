@@ -9,7 +9,7 @@ class PortfolioRebalancer extends PortfolioValueCalculation {
       accumulatedCash: Double):Seq[AddnlQty] =
 
     firstEstimateQuantitiesToAcquire.map { fEQTA =>
-      val maybeNAV = portfolioSnapshot.eTFDatas.find(eTFData => eTFData.eTFCode == fEQTA.eTFCode).map(_.nAV)
+      val maybeNAV = portfolioSnapshot.sameDateUniqueCodesETFDatas.find(eTFData => eTFData.eTFCode == fEQTA.eTFCode).map(_.nAV)
       val qty = maybeNAV.fold(0) { nAV =>
         if (fEQTA.quantityToAcquire <= 0)
           0
@@ -39,7 +39,7 @@ class PortfolioRebalancer extends PortfolioValueCalculation {
     portfolioSnapshot: PortfolioSnapshot,
     portfolioQuantitiesToAcquire: PortfolioQuantitiesToAcquire): Double = {
 
-    val newPortfolioValue = portfolioSnapshot.eTFDatas.map { eTFData =>
+    val newPortfolioValue = portfolioSnapshot.sameDateUniqueCodesETFDatas.map { eTFData =>
       val price = eTFData.nAV
       val quantity =
         portfolioQuantitiesToAcquire.quantitiesToAcquire
@@ -48,7 +48,7 @@ class PortfolioRebalancer extends PortfolioValueCalculation {
     }.sum
 
     portfolioDesign.eTFSelections.map { selection =>
-      val eTFSnapshot = portfolioSnapshot.eTFDatas.find(_.eTFCode == selection.eTFCode)
+      val eTFSnapshot = portfolioSnapshot.sameDateUniqueCodesETFDatas.find(_.eTFCode == selection.eTFCode)
       val quantityToAcquire =
         portfolioQuantitiesToAcquire.quantitiesToAcquire.find(_.eTFCode == selection.eTFCode).fold(0)(_.quantityToAcquire)
       val nAV = eTFSnapshot.map(_.nAV).getOrElse(0d)
@@ -66,7 +66,7 @@ class PortfolioRebalancer extends PortfolioValueCalculation {
     accumulatedExDividends: Double,
     accumulatedCash: Double):FinalPortfolioQuantitiesToHave = {
 
-    lazy val finalPortfolioQuantitiesToHaveDefault = portfolioSnapshot.eTFDatas.map { eTFData =>
+    lazy val finalPortfolioQuantitiesToHaveDefault = portfolioSnapshot.sameDateUniqueCodesETFDatas.map { eTFData =>
       FinalPortfolioQuantityToHave(eTFData.eTFCode, eTFData.quantity.toInt)
     }
 
@@ -80,7 +80,7 @@ class PortfolioRebalancer extends PortfolioValueCalculation {
       val maxActualDeviation = maxAbsDeviation(portfolioDesign, portfolioSnapshot, newQuantitiesToAcquire)
       val finalPortfolioQuantitiesToHave = additionalQuantities.map { additionalQuantity =>
         val initialQuantity =
-          portfolioSnapshot.eTFDatas.find(_.eTFCode == additionalQuantity.eTFCode).fold(0)(_.quantity.toInt)
+          portfolioSnapshot.sameDateUniqueCodesETFDatas.find(_.eTFCode == additionalQuantity.eTFCode).fold(0)(_.quantity.toInt)
         val firstEstimatedQuantityToAcquire =
           firstEstimateQuantitiesToAcquire.quantitiesToAcquire
           .find(_.eTFCode == additionalQuantity.eTFCode).fold(0)(_.quantityToAcquire)

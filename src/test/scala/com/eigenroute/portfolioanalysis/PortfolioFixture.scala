@@ -21,12 +21,13 @@ trait PortfolioFixture {
   val eTFDSelection = ETFSelection(eTFD, 0.15)
   val portfolioDesign = PortfolioDesign(Seq(eTFASelection, eTFBSelection, eTFCSelection, eTFDSelection))
 
-  val eTFDataPlusA = ETFDataPlus(now, eTFA, "", 20, 0, 50, 0d)
-  val eTFDataPlusB = ETFDataPlus(now, eTFB, "", 30, 0, 100, 0d)
-  val eTFDataPlusC = ETFDataPlus(now, eTFC, "", 40, 0, 100, 0d)
-  val eTFDataPlusD = ETFDataPlus(now, eTFD, "", 50, 0, 40, 0d)
+  val eTFDataPlusA = ETFDataPlus(now, eTFA, "1", 20, 0, 50, 0d)
+  val eTFDataPlusB = ETFDataPlus(now, eTFB, "1", 30, 0, 100, 0d)
+  val eTFDataPlusC = ETFDataPlus(now, eTFC, "1", 40, 0, 100, 0d)
+  val eTFDataPlusD = ETFDataPlus(now, eTFD, "1", 50, 0, 40, 0d)
   val portfolioSnapshot = PortfolioSnapshot(Seq(eTFDataPlusA, eTFDataPlusB, eTFDataPlusC, eTFDataPlusD))
-  val portfolioSnapshotZeroQuantity = PortfolioSnapshot(portfolioSnapshot.eTFDatas.map(_.copy(quantity = 0d)))
+  val portfolioSnapshotZeroQuantity =
+    PortfolioSnapshot(portfolioSnapshot.sameDateUniqueCodesETFDatas.map(_.copy(quantity = 0d)))
 
   val weightDifferences = Seq(
     PortfolioWeightDifference(eTFA, 0.15),

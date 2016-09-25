@@ -25,8 +25,12 @@ case class ETFDataPlus(
     quantity: Double,
     cash: BigDecimal = 0)
 
-case class PortfolioSnapshot(eTFDatas: Seq[ETFDataPlus]) {
-  require(eTFDatas.map(_.eTFCode.code).distinct.size == eTFDatas.size)
+object ETFDataPlus {
+  def reverseOrder[A <: ETFDataPlus]: Ordering[A] = new Ordering[A] {
+    override def compare(x: A, y: A): Int = {
+      -1*x.asOfDate.compareTo(y.asOfDate)
+    }
+  }
 }
 
 case class ETFQuantity(eTFCode: ETFCode, quantity: BigDecimal)

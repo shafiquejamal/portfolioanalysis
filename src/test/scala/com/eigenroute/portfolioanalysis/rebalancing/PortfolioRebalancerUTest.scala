@@ -109,7 +109,7 @@ class PortfolioRebalancerUTest extends FlatSpec with ShouldMatchers with Portfol
       portfolioDesign,
       portfolioSnapshot,
       PortfolioQuantitiesToAcquire(expectedFirstEstimateQuantitiesOneTrade),
-      Seq(), 0d, 0d) shouldEqual FinalPortfolioQuantitiesToHave(portfolioSnapshot.eTFDatas.map { eTFData =>
+      Seq(), 0d, 0d) shouldEqual FinalPortfolioQuantitiesToHave(portfolioSnapshot.sameDateUniqueCodesETFDatas.map { eTFData =>
           FinalPortfolioQuantityToHave(eTFData.eTFCode, eTFData.quantity.toInt)
         }, pr.cashRemaining(PortfolioQuantitiesToAcquire(expectedFirstEstimateQuantitiesOneTrade).quantitiesToAcquire),
           0, Seq())

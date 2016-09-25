@@ -28,7 +28,7 @@ class NewDesiredValuesCalculator extends PortfolioValueCalculation {
     val extraCashToInvest = accumulatedCash + accumulatedExDividends - tradingCosts
 
     val totalValueOfETFsToTrade =
-      portfolioValueFromETFDatas(portfolioSnapshot.eTFDatas.filter { eTFData =>
+      portfolioValueFromETFDatas(portfolioSnapshot.sameDateUniqueCodesETFDatas.filter { eTFData =>
         normalizedWeightOfETFsToTrade.map(_.eTFCode).contains(eTFData.eTFCode) }) + extraCashToInvest
 
     val valueOfETFsToTrade: Seq[ETFDesiredValue]  =

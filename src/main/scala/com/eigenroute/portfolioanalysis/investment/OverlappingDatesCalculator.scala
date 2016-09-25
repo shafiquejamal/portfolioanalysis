@@ -4,17 +4,23 @@ import com.eigenroute.portfolioanalysis.rebalancing.{ETFDataPlus, PortfolioDesig
 import org.apache.spark.sql.Dataset
 import org.joda.time.DateTime
 
-class OverlappingDatesCalculator(portfolioDesign: PortfolioDesign, ds:Dataset[ETFDataPlus]) {
+class OverlappingDatesCalculator(portfolioDesign: PortfolioDesign) {
 
-  private val datasets =
-    portfolioDesign.eTFSelections.map { selection => ds.filter(_.eTFCode == selection.eTFCode).orderBy("asOfDate") }
-  private val eTFDatas = datasets.map(_.collect().toSeq)
-  private val datesForFirstETF: Seq[DateTime] =
-    eTFDatas.headOption.map{eTFDatas => eTFDatas.map( eTFData => new DateTime(eTFData.asOfDate))}.toSeq.flatten
+  def overlappingDates(ds:Dataset[ETFDataPlus]): Seq[DateTime] = {
+    val datasets =
+      portfolioDesign.eTFSelections.map { selection => ds.filter(_.eTFCode == selection.eTFCode) }
+    overlappingDates(datasets)
+  }
 
-  def overlappingDates: Seq[DateTime] =
-    eTFDatas.foldLeft(datesForFirstETF){ case (accumulatedCommonDates, eTFData) =>
-      accumulatedCommonDates.intersect(eTFData.map( eTFData => new DateTime(eTFData.asOfDate.getTime)))
-    }.sortBy(_.getMillis)
+  def overlappingDates(datasets:Seq[Dataset[ETFDataPlus]]): Seq[DateTime] = {
+    val eTFDatas = datasets.map(_.collect().toSeq)
+    val datesForFirstETF: Seq[DateTime] =
+      eTFDatas.headOption.map{eTFDatas => eTFDatas.map( eTFData => new DateTime(eTFData.asOfDate))}.toSeq.flatten
+
+    eTFDatas.foldLeft(datesForFirstETF) { case (accumulatedCommonDates, eTFData) =>
+      accumulatedCommonDates.intersect(eTFData.map(eTFData => new DateTime(eTFData.asOfDate.getTime)))
+    }
+  }
+
 
 }
