@@ -1,15 +1,18 @@
 package com.eigenroute.portfolioanalysis.rebalancing
 
-class NewDesiredValuesCalculator extends PortfolioValueCalculation {
+class NewDesiredValuesCalculator(
+    weightDifferenceCalculator: WeightDifferenceCalculator = new WeightDifferenceCalculator)
+  extends PortfolioValueCalculation {
 
   def newDesiredValues(
       portfolioDesign: PortfolioDesign,
-      weightDifferences: Seq[PortfolioWeightDifference],
       portfolioSnapshot: PortfolioSnapshot,
       maxAllowedDeviation: Double,
       perETFTradingCost: Double,
       accumulatedExDividends: Double,
       accumulatedCash: Double):Seq[ETFDesiredValue] = {
+
+    val weightDifferences = weightDifferenceCalculator.weightDifferences(portfolioDesign, portfolioSnapshot)
 
     val eTFsToTrade = weightDifferences.filter( pWD => math.abs(pWD.weightDifference) > maxAllowedDeviation)
     val eTFsToNotTrade = weightDifferences.diff(eTFsToTrade)

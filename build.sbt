@@ -11,6 +11,7 @@ libraryDependencies ++= Seq(
   "org.postgresql" % "postgresql" % "9.4.1209.jre7",
   "log4j" % "log4j" % "1.2.17",
   "joda-time" % "joda-time" % "2.9.4",
+  "org.scalamock" %% "scalamock-scalatest-support" % "3.2.2" % Test,
   "org.scalatest" %% "scalatest" % "2.2.6" % Test)
 
 javaOptions in (Test, run) ++= Seq("-Dspark.master=local",
