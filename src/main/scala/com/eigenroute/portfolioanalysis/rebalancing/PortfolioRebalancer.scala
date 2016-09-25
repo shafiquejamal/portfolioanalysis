@@ -35,22 +35,38 @@ class PortfolioRebalancer(
           math
           .floor(
             (cashRemaining(firstEstimateQuantitiesToAcquire) + accumulatedExDividends + accumulatedCash) / nAV).toInt
-        }
-        AddnlQty(fEQTA.eTFCode, qty)
       }
-
+      AddnlQty(fEQTA.eTFCode, qty)
     }
+  }
 
-  def additionalQuantities(maxQuantities: Seq[AddnlQty]):Seq[Seq[AddnlQty]] =
-    maxQuantities.foldLeft[Seq[Seq[AddnlQty]]](Seq()) { case (acc, maxQ) =>
+  def additionalQuantities(
+      portfolioDesign: PortfolioDesign,
+      portfolioSnapshot: PortfolioSnapshot,
+      bidAskCostFractionOfNAV: Double,
+      maxAllowedDeviation: Double,
+      perETFTradingCost: Double,
+      accumulatedExDividends: Double,
+      accumulatedCash: Double):Seq[Seq[AddnlQty]] = {
+
+    val maxQtys =
+      maxQuantities(
+        portfolioDesign,
+        portfolioSnapshot,
+        bidAskCostFractionOfNAV,
+        maxAllowedDeviation,
+        perETFTradingCost,
+        accumulatedExDividends,
+        accumulatedCash)
+    maxQtys.foldLeft[Seq[Seq[AddnlQty]]](Seq()) { case (acc, maxQ) =>
       if (acc.isEmpty) {
         (0 to maxQ.quanitity map { qty => Seq(AddnlQty(maxQ.eTFCode, qty)) }).toSeq
       } else
         (0 to maxQ.quanitity map { qty => AddnlQty(maxQ.eTFCode, qty) }).toSeq.flatMap { subsequent =>
-          acc.map { accumulated => accumulated :+ subsequent
-          }
+          acc.map { accumulated => accumulated :+ subsequent }
         }
     }
+  }
 
   def maxAbsDeviation(
     portfolioDesign: PortfolioDesign,

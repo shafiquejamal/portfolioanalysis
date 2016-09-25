@@ -44,7 +44,7 @@ class PortfolioRebalancerUTest extends FlatSpec with ShouldMatchers with Portfol
   }
 
   "The additional quantities to acquire generator" should "generate and exhaustive list of possible additional " +
-  "quantities" in new AdditionalQuantitiesFixture with Fixture {
+  "quantities" in new AdditionalQuantitiesFixture with Fixture with EstimatedQuantitiesToAcquire{
 
     val allMatchReverse = Seq(AddnlQty(eTFD, 0), AddnlQty(eTFC, 0), AddnlQty(eTFB, 2), AddnlQty(eTFA, 3))
     val expectedReverse = Seq(
@@ -62,9 +62,11 @@ class PortfolioRebalancerUTest extends FlatSpec with ShouldMatchers with Portfol
       Seq(AddnlQty(eTFD, 0), AddnlQty(eTFC, 0), AddnlQty(eTFB, 0), AddnlQty(eTFA, 0))
     )
 
-    pr.additionalQuantities(expectedAdditionalQuantitiesAllMatch) should
+    (mockFirstEstimatesCalculator.firstEstimateQuantitiesToAcquire _)
+    .expects(portfolioDesign, portfolioSnapshot, 0.0011, 0d, 10d, 0d, 0d)
+    .returning(expectedFirstEstimateQuantitiesAllTrades)
+    pr.additionalQuantities(portfolioDesign, portfolioSnapshot, 0.0011, 0d, 10d, 0d, 0d) should
       contain theSameElementsAs expectedAdditionalQuantitiesFull
-    pr.additionalQuantities(allMatchReverse) should contain theSameElementsAs expectedReverse
   }
 
   "The max absolute deviation from desired weights calculator" should "return the maximum deviation from the desired " +
@@ -144,7 +146,11 @@ class PortfolioRebalancerUTest extends FlatSpec with ShouldMatchers with Portfol
       AddnlQty(eTFD, 1)
     )
 
-    val additionalQuantities = pr.additionalQuantities(expectedAdditionalQuantitiesFirstTrades)
+    (mockFirstEstimatesCalculator.firstEstimateQuantitiesToAcquire _)
+    .expects(portfolioDesign, portfolioSnapshotZeroQuantity, 0.0011, 0d, 10d, 0d, 10000d)
+    .returning(expectedFirstEstimateQuantitiesFirstTrades)
+    val additionalQuantities =
+      pr.additionalQuantities(portfolioDesign, portfolioSnapshotZeroQuantity, 0.0011, 0d, 10d, 0d, 10000d)
     val notRounded = pr.finalQuantities(
       portfolioDesign,
       portfolioSnapshotZeroQuantity,
@@ -154,7 +160,6 @@ class PortfolioRebalancerUTest extends FlatSpec with ShouldMatchers with Portfol
       cashRemaining = round(notRounded.cashRemaining),
       maxActualDeviation = round(notRounded.maxActualDeviation)) shouldEqual
         FinalPortfolioQuantitiesToHave(expectedFinalQuantitiesToHave, 9.0220, 0.00100, expectedAdditionalQuantities)
-
   }
 
   "The cash remaining calculator" should "correctly calculate the cash remaining after trades" in
