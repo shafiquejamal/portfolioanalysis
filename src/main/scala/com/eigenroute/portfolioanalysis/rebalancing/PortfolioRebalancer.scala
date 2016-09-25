@@ -1,27 +1,45 @@
 package com.eigenroute.portfolioanalysis.rebalancing
 
-class PortfolioRebalancer extends PortfolioValueCalculation {
+class PortfolioRebalancer(
+    firstEstimateQuantitiesToAcquireCalculator: FirstEstimateQuantitiesToAcquireCalculator =
+      new FirstEstimateQuantitiesToAcquireCalculator)
+  extends PortfolioValueCalculation {
 
   def maxQuantities(
-      firstEstimateQuantitiesToAcquire: Seq[PortfolioQuantityToAcquire],
+      portfolioDesign: PortfolioDesign,
       portfolioSnapshot: PortfolioSnapshot,
+      bidAskCostFractionOfNAV: Double,
+      maxAllowedDeviation: Double,
+      perETFTradingCost: Double,
       accumulatedExDividends: Double,
-      accumulatedCash: Double):Seq[AddnlQty] =
+      accumulatedCash: Double):Seq[AddnlQty] = {
 
+    val firstEstimateQuantitiesToAcquire =
+      firstEstimateQuantitiesToAcquireCalculator
+      .firstEstimateQuantitiesToAcquire(
+          portfolioDesign,
+          portfolioSnapshot,
+          bidAskCostFractionOfNAV,
+          maxAllowedDeviation,
+          perETFTradingCost,
+          accumulatedExDividends,
+          accumulatedCash
+      )
     firstEstimateQuantitiesToAcquire.map { fEQTA =>
-      val maybeNAV = portfolioSnapshot.sameDateUniqueCodesETFDatas.find(eTFData => eTFData.eTFCode == fEQTA.eTFCode).map(_.nAV)
+      val maybeNAV =
+        portfolioSnapshot.sameDateUniqueCodesETFDatas.find(eTFData => eTFData.eTFCode == fEQTA.eTFCode).map(_.nAV)
       val qty = maybeNAV.fold(0) { nAV =>
         if (fEQTA.quantityToAcquire <= 0)
           0
         else
           math
           .floor(
-            (cashRemaining(firstEstimateQuantitiesToAcquire) +
-             accumulatedExDividends +
-             accumulatedCash) / nAV)
-          .toInt
+            (cashRemaining(firstEstimateQuantitiesToAcquire) + accumulatedExDividends + accumulatedCash) / nAV).toInt
+        }
+        AddnlQty(fEQTA.eTFCode, qty)
       }
-      AddnlQty(fEQTA.eTFCode, qty)}
+
+    }
 
   def additionalQuantities(maxQuantities: Seq[AddnlQty]):Seq[Seq[AddnlQty]] =
     maxQuantities.foldLeft[Seq[Seq[AddnlQty]]](Seq()) { case (acc, maxQ) =>
