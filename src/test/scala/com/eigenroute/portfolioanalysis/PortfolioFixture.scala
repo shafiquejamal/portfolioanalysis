@@ -26,7 +26,8 @@ trait PortfolioFixture {
   val eTFDataPlusC = ETFDataPlus(now, eTFC, "1", 40, 0, 100, 0d)
   val eTFDataPlusD = ETFDataPlus(now, eTFD, "1", 50, 0, 40, 0d)
   val portfolioSnapshot = PortfolioSnapshot(Seq(eTFDataPlusA, eTFDataPlusB, eTFDataPlusC, eTFDataPlusD))
-  val portfolioSnapshotZeroQuantity = PortfolioSnapshot(portfolioSnapshot.sameDateUniqueCodesETFDatas.map(_.copy(quantity = 0d)))
+  val portfolioSnapshotZeroQuantity =
+    PortfolioSnapshot(portfolioSnapshot.sameDateUniqueCodesETFDatas.map(_.copy(quantity = 0d)))
 
   val weightDifferences = Seq(
     PortfolioWeightDifference(eTFA, 0.15),
@@ -141,41 +142,30 @@ trait PortfolioFixture {
 
   trait AdditionalQuantitiesFixture {
     val expectedAdditionalQuantitiesAllMatch =
-      Seq(AddnlQty(eTFA, 6), AddnlQty(eTFB, 4), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0))
+      Seq(AddnlQty(eTFA, 5), AddnlQty(eTFB, 3), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0))
 
     val expectedAdditionalQuantitiesFirstTrades =
       Seq(AddnlQty(eTFA, 5), AddnlQty(eTFB, 3), AddnlQty(eTFC, 2), AddnlQty(eTFD, 2))
 
     val expectedAdditionalQuantitiesFull = Seq(
-      Seq(AddnlQty(eTFA, 6), AddnlQty(eTFB, 4), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 5), AddnlQty(eTFB, 4), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 4), AddnlQty(eTFB, 4), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 3), AddnlQty(eTFB, 4), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 2), AddnlQty(eTFB, 4), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 1), AddnlQty(eTFB, 4), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 0), AddnlQty(eTFB, 4), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 6), AddnlQty(eTFB, 3), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
       Seq(AddnlQty(eTFA, 5), AddnlQty(eTFB, 3), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
       Seq(AddnlQty(eTFA, 4), AddnlQty(eTFB, 3), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
       Seq(AddnlQty(eTFA, 3), AddnlQty(eTFB, 3), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
       Seq(AddnlQty(eTFA, 2), AddnlQty(eTFB, 3), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
       Seq(AddnlQty(eTFA, 1), AddnlQty(eTFB, 3), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
       Seq(AddnlQty(eTFA, 0), AddnlQty(eTFB, 3), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 6), AddnlQty(eTFB, 2), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
       Seq(AddnlQty(eTFA, 5), AddnlQty(eTFB, 2), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
       Seq(AddnlQty(eTFA, 4), AddnlQty(eTFB, 2), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
       Seq(AddnlQty(eTFA, 3), AddnlQty(eTFB, 2), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
       Seq(AddnlQty(eTFA, 2), AddnlQty(eTFB, 2), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
       Seq(AddnlQty(eTFA, 1), AddnlQty(eTFB, 2), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
       Seq(AddnlQty(eTFA, 0), AddnlQty(eTFB, 2), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 6), AddnlQty(eTFB, 1), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
       Seq(AddnlQty(eTFA, 5), AddnlQty(eTFB, 1), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
       Seq(AddnlQty(eTFA, 4), AddnlQty(eTFB, 1), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
       Seq(AddnlQty(eTFA, 3), AddnlQty(eTFB, 1), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
       Seq(AddnlQty(eTFA, 2), AddnlQty(eTFB, 1), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
       Seq(AddnlQty(eTFA, 1), AddnlQty(eTFB, 1), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
       Seq(AddnlQty(eTFA, 0), AddnlQty(eTFB, 1), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
-      Seq(AddnlQty(eTFA, 6), AddnlQty(eTFB, 0), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
       Seq(AddnlQty(eTFA, 5), AddnlQty(eTFB, 0), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
       Seq(AddnlQty(eTFA, 4), AddnlQty(eTFB, 0), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),
       Seq(AddnlQty(eTFA, 3), AddnlQty(eTFB, 0), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0)),

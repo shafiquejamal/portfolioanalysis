@@ -6,12 +6,16 @@ class WeightDifferenceCalculator extends PortfolioValueCalculation {
      portfolioDesign: PortfolioDesign,
      portfolioSnapshot: PortfolioSnapshot):Seq[PortfolioWeightDifference] = {
 
-    val portfolioVal = portfolioValue(portfolioSnapshot)
+    val portfolioVal = portfolioValueETFsOnly(portfolioSnapshot)
 
     portfolioDesign.eTFSelections.map { eTFDATA =>
       val eTFCode = eTFDATA.eTFCode
       val desiredWeight = eTFDATA.desiredWeight
-      val actualWeight = actualValue(portfolioSnapshot, eTFCode) / portfolioVal
+      val actualWeight =
+        if (portfolioVal != 0)
+          actualValue(portfolioSnapshot, eTFCode) / portfolioVal
+        else
+          0d
       PortfolioWeightDifference(eTFCode, desiredWeight - actualWeight)
     }
 

@@ -10,7 +10,7 @@ class PortfolioRebalancerUTest extends FlatSpec with ShouldMatchers with Portfol
     val mockFirstEstimatesCalculator = mock[FirstEstimateQuantitiesToAcquireCalculator]
   }
 
-  "The max quantities generator" should "calculate the maximum quantity of each ETF that can be purchased with the" +
+  "The max quantities generator" should "calculate the maximum quantity of each ETF that can be purchased with the " +
   "remaining cash" in new EstimatedQuantitiesToAcquire with AdditionalQuantitiesFixture with Fixture {
 
     (mockFirstEstimatesCalculator.firstEstimateQuantitiesToAcquire _)
@@ -25,7 +25,7 @@ class PortfolioRebalancerUTest extends FlatSpec with ShouldMatchers with Portfol
       PortfolioQuantityToAcquire(eTFC, -76, round(40 / (1 + 0.0011)), -75.0825),
       PortfolioQuantityToAcquire(eTFD, -11, round(50 / (1 + 0.0011)), -10.011)
     )
-    val expectedOneNotMatched = Seq(AddnlQty(eTFNotInSnapshot, 0), AddnlQty(eTFB, 4), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0))
+    val expectedOneNotMatched = Seq(AddnlQty(eTFNotInSnapshot, 0), AddnlQty(eTFB, 3), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0))
 
     prAllMatch.maxQuantities should contain theSameElementsAs expectedAdditionalQuantitiesAllMatch
 
@@ -53,22 +53,6 @@ class PortfolioRebalancerUTest extends FlatSpec with ShouldMatchers with Portfol
   "The additional quantities to acquire generator" should "generate and exhaustive list of possible additional " +
   "quantities" in new AdditionalQuantitiesFixture with Fixture with EstimatedQuantitiesToAcquire {
 
-    val allMatchReverse = Seq(AddnlQty(eTFD, 0), AddnlQty(eTFC, 0), AddnlQty(eTFB, 2), AddnlQty(eTFA, 3))
-    val expectedReverse = Seq(
-      Seq(AddnlQty(eTFD, 0), AddnlQty(eTFC, 0), AddnlQty(eTFB, 2), AddnlQty(eTFA, 3)),
-      Seq(AddnlQty(eTFD, 0), AddnlQty(eTFC, 0), AddnlQty(eTFB, 1), AddnlQty(eTFA, 3)),
-      Seq(AddnlQty(eTFD, 0), AddnlQty(eTFC, 0), AddnlQty(eTFB, 0), AddnlQty(eTFA, 3)),
-      Seq(AddnlQty(eTFD, 0), AddnlQty(eTFC, 0), AddnlQty(eTFB, 2), AddnlQty(eTFA, 2)),
-      Seq(AddnlQty(eTFD, 0), AddnlQty(eTFC, 0), AddnlQty(eTFB, 1), AddnlQty(eTFA, 2)),
-      Seq(AddnlQty(eTFD, 0), AddnlQty(eTFC, 0), AddnlQty(eTFB, 0), AddnlQty(eTFA, 2)),
-      Seq(AddnlQty(eTFD, 0), AddnlQty(eTFC, 0), AddnlQty(eTFB, 2), AddnlQty(eTFA, 1)),
-      Seq(AddnlQty(eTFD, 0), AddnlQty(eTFC, 0), AddnlQty(eTFB, 1), AddnlQty(eTFA, 1)),
-      Seq(AddnlQty(eTFD, 0), AddnlQty(eTFC, 0), AddnlQty(eTFB, 0), AddnlQty(eTFA, 1)),
-      Seq(AddnlQty(eTFD, 0), AddnlQty(eTFC, 0), AddnlQty(eTFB, 2), AddnlQty(eTFA, 0)),
-      Seq(AddnlQty(eTFD, 0), AddnlQty(eTFC, 0), AddnlQty(eTFB, 1), AddnlQty(eTFA, 0)),
-      Seq(AddnlQty(eTFD, 0), AddnlQty(eTFC, 0), AddnlQty(eTFB, 0), AddnlQty(eTFA, 0))
-    )
-
     (mockFirstEstimatesCalculator.firstEstimateQuantitiesToAcquire _)
     .expects(portfolioDesign, portfolioSnapshot, 0.0011, 0d, 10d, 0d, 0d)
     .returning(expectedFirstEstimateQuantitiesAllTrades)
@@ -88,17 +72,17 @@ class PortfolioRebalancerUTest extends FlatSpec with ShouldMatchers with Portfol
     val pr =
       new PortfolioRebalancer(portfolioDesign, portfolioSnapshot, 0.0011, 0d, 10d, 0d, 0d, mockFirstEstimatesCalculator)
 
-    round(pr.maxAbsDeviation(
-      portfolioDesign,
-      portfolioSnapshot,
-      PortfolioQuantitiesToAcquire(
-        expectedFinalQuantitiesToAcquireAllTrades))) shouldEqual 0.00485
+    round(pr.maxAbsDeviation(PortfolioQuantitiesToAcquire(expectedFinalQuantitiesToAcquireAllTrades))) shouldEqual 0.00485
 
-    round(pr.maxAbsDeviation(
-      portfolioDesign,
-      portfolioSnapshotZeroQuantity,
-      PortfolioQuantitiesToAcquire(
-        expectedFinalQuantitiesToAcquireAllTrades))) shouldEqual 1
+    (mockFirstEstimatesCalculator.firstEstimateQuantitiesToAcquire _)
+    .expects(portfolioDesign, portfolioSnapshotZeroQuantity, 0.0011, 0d, 10d, 0d, 0d)
+    .returning(expectedFirstEstimateQuantitiesAllTrades)
+    val prZeroQuantity =
+      new PortfolioRebalancer(portfolioDesign, portfolioSnapshotZeroQuantity, 0.0011, 0d, 10d, 0d, 0d,
+        mockFirstEstimatesCalculator)
+
+    round(
+      prZeroQuantity.maxAbsDeviation(PortfolioQuantitiesToAcquire(expectedFinalQuantitiesToAcquireAllTrades))) shouldEqual 1
 
   }
 

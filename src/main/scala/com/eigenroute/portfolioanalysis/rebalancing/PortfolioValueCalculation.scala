@@ -2,7 +2,7 @@ package com.eigenroute.portfolioanalysis.rebalancing
 
 trait PortfolioValueCalculation {
 
-  def portfolioValue(portfolioSnapshot: PortfolioSnapshot): Double =
+  def portfolioValueETFsOnly(portfolioSnapshot: PortfolioSnapshot): Double =
     portfolioValueFromETFDatas(portfolioSnapshot.sameDateUniqueCodesETFDatas)
 
   def portfolioValueFromETFDatas(eTFDatas: Seq[ETFDataPlus]): Double =
