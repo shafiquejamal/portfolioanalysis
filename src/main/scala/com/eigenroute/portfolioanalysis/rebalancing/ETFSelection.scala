@@ -6,23 +6,23 @@ case class ETFCode(code: String) {
   require(code.length == 3)
 }
 
-case class ETFSelection(eTFCode: ETFCode, desiredWeight: Double) {
+case class ETFSelection(eTFCode: ETFCode, desiredWeight: BigDecimal) {
   require(desiredWeight >= 0 & desiredWeight <= 1)
 }
 
-case class PortfolioDesign(eTFSelections: Seq[ETFSelection], tolerance: Double = 0.00001) {
-  require(math.pow(eTFSelections.map(_.desiredWeight).sum - 1, 2) <= tolerance)
+case class PortfolioDesign(eTFSelections: Seq[ETFSelection], tolerance: BigDecimal = 0.00001) {
+  require(math.pow((eTFSelections.map(_.desiredWeight).sum - 1).toDouble, 2) <= tolerance)
 }
 
-case class ETFData(asOfDate: Date, code: String, xnumber: String, nAV: Double, exDividend: Double)
+case class ETFData(asOfDate: Date, code: String, xnumber: String, nAV: BigDecimal, exDividend: BigDecimal)
 
 case class ETFDataPlus(
     asOfDate: Date,
     eTFCode: ETFCode,
     xnumber: String,
-    nAV: Double,
-    exDividend: Double,
-    quantity: Double,
+    nAV: BigDecimal,
+    exDividend: BigDecimal,
+    quantity: BigDecimal,
     cash: BigDecimal = 0)
 
 object ETFDataPlus {

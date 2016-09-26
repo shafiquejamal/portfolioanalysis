@@ -7,11 +7,12 @@ class FirstEstimateQuantitiesToAcquireCalculator(
   def firstEstimateQuantitiesToAcquire(
       portfolioDesign: PortfolioDesign,
       portfolioSnapshot: PortfolioSnapshot,
-      bidAskCostFractionOfNAV: Double,
-      maxAllowedDeviation: Double,
-      perETFTradingCost: Double,
-      accumulatedExDividends: Double,
-      accumulatedCash: Double): Seq[PortfolioQuantityToAcquire] = {
+      bidAskCostFractionOfNAV: BigDecimal,
+      maxAllowedDeviation: BigDecimal,
+      perETFTradingCost: BigDecimal,
+      accumulatedExDividends: BigDecimal,
+      accumulatedCash: BigDecimal): Seq[PortfolioQuantityToAcquire] = {
+
     val valueDifferences =
       valueDifferencesCalculator.valueDifferences(
         portfolioDesign,
@@ -20,7 +21,8 @@ class FirstEstimateQuantitiesToAcquireCalculator(
         perETFTradingCost,
         accumulatedExDividends,
         accumulatedCash)
-    def price(valueDifference:Double, nAV: Double):Double =
+
+    def price(valueDifference:BigDecimal, nAV: BigDecimal):BigDecimal =
       if (valueDifference > 0)
         nAV * (1 + bidAskCostFractionOfNAV)
       else
@@ -29,8 +31,8 @@ class FirstEstimateQuantitiesToAcquireCalculator(
     valueDifferences.map { pVD =>
       val maybeNAV = portfolioSnapshot.sameDateUniqueCodesETFDatas.find(_.eTFCode == pVD.eTFCode).map(_.nAV)
       val maybeEffectivePrice = maybeNAV.map(nAV => price(pVD.valueDifference, nAV))
-      val quantity: Double = maybeEffectivePrice map (pVD.valueDifference / _) getOrElse 0d
-      PortfolioQuantityToAcquire(pVD.eTFCode, math.floor(quantity).toInt, maybeEffectivePrice.getOrElse(0d), quantity)
+      val quantity: Double = maybeEffectivePrice map (price => (pVD.valueDifference / price).toDouble) getOrElse 0d
+      PortfolioQuantityToAcquire(pVD.eTFCode, math.floor(quantity).toInt, maybeEffectivePrice.getOrElse(0), quantity)
     }
   }
 

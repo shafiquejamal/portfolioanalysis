@@ -36,7 +36,7 @@ trait PortfolioFixture {
     PortfolioWeightDifference(eTFD, -0.05)
   )
 
-  def round(double: Double, n: Int = 5): Double = BigDecimal(double).setScale(n, BigDecimal.RoundingMode.HALF_UP).toDouble
+  def round(numberToRound: BigDecimal, n: Int = 5): BigDecimal = numberToRound.setScale(n, BigDecimal.RoundingMode.HALF_UP)
 
   trait DesiredValueFixture {
     val expectedDesiredValuesOneToBeTraded = Seq(
@@ -74,12 +74,12 @@ trait PortfolioFixture {
       ETFDesiredValue(eTFD, 1500d, isToTrade = true)
     )
 
-    val expectedValueDifferenceOneTrade = Seq(
+    val expectedValueDifferenceOneNotTraded = Seq(
       PortfolioValueDifference(eTFA, 1355.88235),
       PortfolioValueDifference(eTFB, 1711.76471),
       PortfolioValueDifference(eTFC, -3057.64706),
       PortfolioValueDifference(eTFD, 0.00000)
-    )
+                                                 )
 
     val expectedValueDifferenceNoTrades = Seq(
       PortfolioValueDifference(eTFA, 0d),
@@ -118,7 +118,7 @@ trait PortfolioFixture {
       PortfolioQuantityToAcquire(eTFD, -11, round(50 / (1 + 0.0025)), -10.025)
     )
 
-    val expectedFirstEstimateQuantitiesOneTrade = Seq(
+    val expectedFirstEstimateQuantitiesOneNotTraded = Seq(
       PortfolioQuantityToAcquire(eTFA, 67, round(20 * (1 + 0.0011)), 67.71963),
       PortfolioQuantityToAcquire(eTFB, 56, round(30 * (1 + 0.0011)), 56.99613),
       PortfolioQuantityToAcquire(eTFC, -77, round(40 / (1 + 0.0011)), -76.52526),
@@ -175,10 +175,10 @@ trait PortfolioFixture {
     )
 
     val additionalQuantitiesChosenAllTrades =
-      Seq(AddnlQty(eTFA, 3), AddnlQty(eTFB, 2), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0))
+      Seq(AddnlQty(eTFA, 1), AddnlQty(eTFB, 2), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0))
 
-    val additionalQuantitiesChosenOneTrade =
-      Seq(AddnlQty(eTFA, 1), AddnlQty(eTFB, 1), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0))
+    val additionalQuantitiesChosenOneNotTraded =
+      Seq(AddnlQty(eTFA, 1), AddnlQty(eTFB, 0), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0))
 
     val expectedFinalQuantitiesToAcquireAllTrades = Seq(
       PortfolioQuantityToAcquire(eTFA, 77, round(20 * (1 + 0.0011)), 74.91759),
@@ -188,15 +188,15 @@ trait PortfolioFixture {
     )
 
     val expectedFinalQuantitiesAllTrades = Seq(
-      FinalPortfolioQuantityToHave(eTFA, 127),
+      FinalPortfolioQuantityToHave(eTFA, 125),
       FinalPortfolioQuantityToHave(eTFB, 168),
       FinalPortfolioQuantityToHave(eTFC, 24),
       FinalPortfolioQuantityToHave(eTFD, 29)
     )
 
-    val expectedFinalQuantitiesOneTrade = Seq(
+    val expectedFinalQuantitiesOneNotTraded = Seq(
       FinalPortfolioQuantityToHave(eTFA, 118),
-      FinalPortfolioQuantityToHave(eTFB, 157),
+      FinalPortfolioQuantityToHave(eTFB, 156),
       FinalPortfolioQuantityToHave(eTFC, 23),
       FinalPortfolioQuantityToHave(eTFD, 40)
     )

@@ -7,20 +7,20 @@ class NewDesiredValuesCalculator(
   def newDesiredValues(
       portfolioDesign: PortfolioDesign,
       portfolioSnapshot: PortfolioSnapshot,
-      maxAllowedDeviation: Double,
-      perETFTradingCost: Double,
-      accumulatedExDividends: Double,
-      accumulatedCash: Double):Seq[ETFDesiredValue] = {
+      maxAllowedDeviation: BigDecimal,
+      perETFTradingCost: BigDecimal,
+      accumulatedExDividends: BigDecimal,
+      accumulatedCash: BigDecimal): Seq[ETFDesiredValue] = {
 
     val weightDifferences = weightDifferenceCalculator.weightDifferences(portfolioDesign, portfolioSnapshot)
 
-    val eTFsToTrade = weightDifferences.filter( pWD => math.abs(pWD.weightDifference) > maxAllowedDeviation)
+    val eTFsToTrade = weightDifferences.filter( pWD => math.abs(pWD.weightDifference.toDouble) > maxAllowedDeviation)
     val eTFsToNotTrade = weightDifferences.diff(eTFsToTrade)
     val valueOfETFsNotToTrade: Seq[ETFDesiredValue] =
       eTFsToNotTrade.map { pWD =>
         ETFDesiredValue(pWD.eTFCode, actualValue(portfolioSnapshot, pWD.eTFCode), isToTrade = false) }
 
-    val sumOfRemainingWeights: Double =
+    val sumOfRemainingWeights: BigDecimal =
       portfolioDesign.eTFSelections.filter( eTFSelection => eTFsToTrade.map(_.eTFCode).contains(eTFSelection.eTFCode))
       .map(_.desiredWeight).sum
     val normalizedWeightOfETFsToTrade =

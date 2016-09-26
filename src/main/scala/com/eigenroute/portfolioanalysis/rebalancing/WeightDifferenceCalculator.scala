@@ -11,8 +11,8 @@ class WeightDifferenceCalculator extends PortfolioValueCalculation {
     portfolioDesign.eTFSelections.map { eTFDATA =>
       val eTFCode = eTFDATA.eTFCode
       val desiredWeight = eTFDATA.desiredWeight
-      val actualWeight =
-        if (portfolioVal != 0)
+      val actualWeight: BigDecimal =
+        if (portfolioVal != BigDecimal(0))
           actualValue(portfolioSnapshot, eTFCode) / portfolioVal
         else
           0d

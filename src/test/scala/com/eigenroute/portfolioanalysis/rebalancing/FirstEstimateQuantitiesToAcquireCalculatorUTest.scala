@@ -19,25 +19,25 @@ class FirstEstimateQuantitiesToAcquireCalculatorUTest
   with EstimatedQuantitiesToAcquire {
 
     (mockValueDifferencesCalculator.valueDifferences _)
-    .expects(portfolioDesign, portfolioSnapshot, 0d, 10d, 0d, 0d)
+    .expects(portfolioDesign, portfolioSnapshot, BigDecimal(0), BigDecimal(10), BigDecimal(0), BigDecimal(0))
     .returning(expectedValueDifferenceAllTrades)
     checkFirstEstimateQuantitiesToAcquire(
       mockValueDifferencesCalculator, expectedFirstEstimateQuantitiesAllTrades, 0.0011, 0d, 10d, 0d, 0d)
 
     (mockValueDifferencesCalculator.valueDifferences _)
-    .expects(portfolioDesign, portfolioSnapshot, 0d, 10d, 0d, 0d)
+    .expects(portfolioDesign, portfolioSnapshot, BigDecimal(0), BigDecimal(10), BigDecimal(0), BigDecimal(0))
     .returning(expectedValueDifferenceAllTrades)
     checkFirstEstimateQuantitiesToAcquire(
       mockValueDifferencesCalculator, expectedFirstEstimateQuantitiesAllTradesExpensive, 0.0025, 0d, 10d, 0d, 0d)
 
     (mockValueDifferencesCalculator.valueDifferences _)
-    .expects(portfolioDesign, portfolioSnapshot, 0d, 10d, 0d, 0d)
-    .returning(expectedValueDifferenceOneTrade)
+    .expects(portfolioDesign, portfolioSnapshot, BigDecimal(0), BigDecimal(10), BigDecimal(0), BigDecimal(0))
+    .returning(expectedValueDifferenceOneNotTraded)
     checkFirstEstimateQuantitiesToAcquire(
-      mockValueDifferencesCalculator, expectedFirstEstimateQuantitiesOneTrade, 0.0011, 0d, 10d, 0d, 0d)
+      mockValueDifferencesCalculator, expectedFirstEstimateQuantitiesOneNotTraded, 0.0011, 0d, 10d, 0d, 0d)
 
     (mockValueDifferencesCalculator.valueDifferences _)
-    .expects(portfolioDesign, portfolioSnapshot, 0d, 10d, 0d, 0d)
+    .expects(portfolioDesign, portfolioSnapshot, BigDecimal(0), BigDecimal(10), BigDecimal(0), BigDecimal(0))
     .returning(expectedValueDifferenceNoTrades)
     checkFirstEstimateQuantitiesToAcquire(
       mockValueDifferencesCalculator, expectedFirstEstimateQuantitiesNoTrades, 0.0011, 0d, 10d, 0d, 0d)
@@ -48,7 +48,7 @@ class FirstEstimateQuantitiesToAcquireCalculatorUTest
   with EstimatedQuantitiesToAcquire {
 
     (mockValueDifferencesCalculator.valueDifferences _)
-    .expects(portfolioDesign, portfolioSnapshotZeroQuantity, 0d, 10d, 0d, 10040d)
+    .expects(portfolioDesign, portfolioSnapshotZeroQuantity, BigDecimal(0), BigDecimal(10), BigDecimal(0), BigDecimal(10040))
     .returning(expectedValueDifferenceFirstTrades)
     new FirstEstimateQuantitiesToAcquireCalculator(mockValueDifferencesCalculator)
     .firstEstimateQuantitiesToAcquire(
@@ -63,11 +63,11 @@ class FirstEstimateQuantitiesToAcquireCalculatorUTest
   private def checkFirstEstimateQuantitiesToAcquire(
       valueDifferencesCalculator: ValueDifferencesCalculator,
       expectedFirstEstimateQuantities: Seq[PortfolioQuantityToAcquire],
-      bidAskCost: Double,
-      maxAllowedDeviation: Double,
-      perETFTradingCost: Double,
-      accumulatedExDividends: Double,
-      accumulatedCash: Double) {
+      bidAskCost: BigDecimal,
+      maxAllowedDeviation: BigDecimal,
+      perETFTradingCost: BigDecimal,
+      accumulatedExDividends: BigDecimal,
+      accumulatedCash: BigDecimal) {
 
     new FirstEstimateQuantitiesToAcquireCalculator(valueDifferencesCalculator)
     .firstEstimateQuantitiesToAcquire(

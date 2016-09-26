@@ -3,11 +3,11 @@ package com.eigenroute.portfolioanalysis.rebalancing
 class PortfolioRebalancer(
     portfolioDesign: PortfolioDesign,
     portfolioSnapshot: PortfolioSnapshot,
-    bidAskCostFractionOfNAV: Double,
-    maxAllowedDeviation: Double,
-    perETFTradingCost: Double,
-    accumulatedExDividends: Double,
-    accumulatedCash: Double,
+    bidAskCostFractionOfNAV: BigDecimal,
+    maxAllowedDeviation: BigDecimal,
+    perETFTradingCost: BigDecimal,
+    accumulatedExDividends: BigDecimal,
+    accumulatedCash: BigDecimal,
     firstEstimateQuantitiesToAcquireCalculator: FirstEstimateQuantitiesToAcquireCalculator =
       new FirstEstimateQuantitiesToAcquireCalculator)
   extends PortfolioValueCalculation {
@@ -24,7 +24,7 @@ class PortfolioRebalancer(
         accumulatedCash
     )
 
-  def maxQuantities:Seq[AddnlQty] = {
+  def maxQuantities:Seq[AddnlQty] =
     firstEstimateQuantitiesToAcquire.map { fEQTA =>
       val maybeNAV =
         portfolioSnapshot.sameDateUniqueCodesETFDatas.find(eTFData => eTFData.eTFCode == fEQTA.eTFCode).map(_.nAV)
@@ -35,12 +35,13 @@ class PortfolioRebalancer(
           val cashRemainingAfterPurchFirstEst = cashRemaining(firstEstimateQuantitiesToAcquire)
           math
           .floor(
-            (cashRemainingAfterPurchFirstEst + accumulatedExDividends + accumulatedCash - 1*perETFTradingCost) / nAV).toInt
+            ((cashRemainingAfterPurchFirstEst + accumulatedExDividends + accumulatedCash -
+              1*perETFTradingCost) / nAV).toDouble).toInt
         }
       }
       AddnlQty(fEQTA.eTFCode, qty)
     }
-  }
+
 
   def additionalQuantities:Seq[Seq[AddnlQty]] =
     maxQuantities.foldLeft[Seq[Seq[AddnlQty]]](Seq()) { case (acc, maxQ) =>
@@ -66,9 +67,9 @@ class PortfolioRebalancer(
       val eTFSnapshot = portfolioSnapshot.sameDateUniqueCodesETFDatas.find(_.eTFCode == selection.eTFCode)
       val quantityToAcquire =
         portfolioQuantitiesToAcquire.quantitiesToAcquire.find(_.eTFCode == selection.eTFCode).fold(0)(_.quantityToAcquire)
-      val nAV = eTFSnapshot.map(_.nAV).getOrElse(0d)
-      val newValue = (quantityToAcquire + eTFSnapshot.map(_.quantity).getOrElse(0d)) * nAV
-      if (newPortfolioValue <= 0) 1d else math.abs(selection.desiredWeight - newValue / newPortfolioValue)
+      val nAV: BigDecimal = eTFSnapshot.map(_.nAV).getOrElse(0)
+      val newValue = (quantityToAcquire + eTFSnapshot.map(_.quantity.toDouble).getOrElse(0d)) * nAV
+      if (newPortfolioValue <= 0) 1d else math.abs((selection.desiredWeight - newValue / newPortfolioValue).toDouble)
     }.max
 
    }
@@ -80,12 +81,14 @@ class PortfolioRebalancer(
     }
 
     val initialCashRemaining =
-      cashRemaining(firstEstimateQuantitiesToAcquire) + accumulatedCash + accumulatedExDividends
+      cashRemaining(firstEstimateQuantitiesToAcquire) + accumulatedCash + accumulatedExDividends -
+      perETFTradingCost*firstEstimateQuantitiesToAcquire.filterNot(_.quantityToAcquire == 0).length
 
     additionalQuantities.map { additionalQtys =>
       val newQuantitiesToAcquire = PortfolioQuantitiesToAcquire(firstEstimateQuantitiesToAcquire) + additionalQtys
       val newCashRemaining =
-        cashRemaining(newQuantitiesToAcquire.quantitiesToAcquire) + accumulatedCash + accumulatedExDividends
+        cashRemaining(newQuantitiesToAcquire.quantitiesToAcquire) + accumulatedCash + accumulatedExDividends -
+        perETFTradingCost*newQuantitiesToAcquire.quantitiesToAcquire.filterNot(_.quantityToAcquire == 0).length
       val maxActualDeviation = maxAbsDeviation(newQuantitiesToAcquire)
       val finalPortfolioQuantitiesToHave = additionalQtys.map { additionalQuantity =>
         val initialQuantity =
@@ -108,7 +111,12 @@ class PortfolioRebalancer(
     .getOrElse(FinalPortfolioQuantitiesToHave(finalPortfolioQuantitiesToHaveDefault, initialCashRemaining, 0, Seq()))
   }
 
-  def cashRemaining(quantitiesToAcquire: Seq[PortfolioQuantityToAcquire]): Double =
-    -1 * quantitiesToAcquire.map { initialQuantityToAcquire =>
-      initialQuantityToAcquire.quantityToAcquire * initialQuantityToAcquire.effectivePrice}.sum
+  def cashRemaining(quantitiesToAcquire: Seq[PortfolioQuantityToAcquire]): BigDecimal = {
+
+   val cashNeededForEachTransaction =
+   quantitiesToAcquire.map { initialQuantityToAcquire =>
+      initialQuantityToAcquire.quantityToAcquire * initialQuantityToAcquire.effectivePrice
+                                 }
+    -1*cashNeededForEachTransaction.sum
+  }
 }

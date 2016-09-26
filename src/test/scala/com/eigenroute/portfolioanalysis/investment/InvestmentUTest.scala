@@ -36,6 +36,9 @@ class InvestmentUTest extends FlatSpec with ShouldMatchers with PortfolioFixture
 
     investmentAnnualRebalancing.totalNumberOfRebalancingIntervals shouldEqual 3
     investmentAnnualRebalancing.sortedDatasetsSplitByRebalancingPeriod.length shouldEqual 3
+
+    val temp = investmentAnnualRebalancing.run()(spark).ds.collect()
+    temp
   }
 
 }

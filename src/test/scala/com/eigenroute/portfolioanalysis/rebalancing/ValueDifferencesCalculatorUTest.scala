@@ -15,18 +15,21 @@ class ValueDifferencesCalculatorUTest extends FlatSpec with ShouldMatchers with 
   "for ETFs not to be traded, and should get the signs correct" in new DesiredValueFixture with Fixture {
 
     (mockCalculator.newDesiredValues _)
-    .expects(portfolioDesign, portfolioSnapshot, 0.05, 10d, 0d, 0d).returning(expectedDesiredValuesOneToBeTraded)
+    .expects(portfolioDesign, portfolioSnapshot, BigDecimal(.05), BigDecimal(10), BigDecimal(0), BigDecimal(0))
+    .returning(expectedDesiredValuesOneToBeTraded)
     valueDifferencesCalculator.valueDifferences(portfolioDesign, portfolioSnapshot, 0.05, 10d, 0d, 0d).map { vDiff =>
       PortfolioValueDifference(vDiff.eTFCode, round(vDiff.valueDifference))
-    } should contain theSameElementsAs expectedValueDifferenceOneTrade
+    } should contain theSameElementsAs expectedValueDifferenceOneNotTraded
 
     (mockCalculator.newDesiredValues _)
-    .expects(portfolioDesign, portfolioSnapshot, 1d, 10d, 0d, 0d).returning(expectedDesiredValuesNoTrades)
+    .expects(portfolioDesign, portfolioSnapshot, BigDecimal(1), BigDecimal(10), BigDecimal(0), BigDecimal(0))
+    .returning(expectedDesiredValuesNoTrades)
     valueDifferencesCalculator.valueDifferences(portfolioDesign, portfolioSnapshot, 1d, 10d, 0d, 0d) should
     contain theSameElementsAs expectedValueDifferenceNoTrades
 
     (mockCalculator.newDesiredValues _)
-    .expects(portfolioDesign, portfolioSnapshot, 0d, 10d, 0d, 0d).returning(expectedDesiredValuesAllToBeTraded)
+    .expects(portfolioDesign, portfolioSnapshot, BigDecimal(0), BigDecimal(10), BigDecimal(0), BigDecimal(0))
+    .returning(expectedDesiredValuesAllToBeTraded)
     valueDifferencesCalculator.valueDifferences(portfolioDesign, portfolioSnapshot, 0d, 10d, 0d, 0d) should
     contain theSameElementsAs expectedValueDifferenceAllTrades
   }
@@ -35,7 +38,8 @@ class ValueDifferencesCalculatorUTest extends FlatSpec with ShouldMatchers with 
   with Fixture {
 
     (mockCalculator.newDesiredValues _)
-    .expects(portfolioDesign, portfolioSnapshotZeroQuantity, 0d, 10d, 0d, 10040d).returning(expectedDesiredValuesFirstTrades)
+    .expects(portfolioDesign, portfolioSnapshotZeroQuantity, BigDecimal(0), BigDecimal(10), BigDecimal(0), BigDecimal(10040))
+    .returning(expectedDesiredValuesFirstTrades)
     valueDifferencesCalculator
     .valueDifferences(portfolioDesign, portfolioSnapshotZeroQuantity, 0d, 10d, 0d, 10040d).map { vDiff =>
       PortfolioValueDifference(vDiff.eTFCode, round(vDiff.valueDifference))
