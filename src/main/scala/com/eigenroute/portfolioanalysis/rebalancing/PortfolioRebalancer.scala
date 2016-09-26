@@ -1,30 +1,31 @@
 package com.eigenroute.portfolioanalysis.rebalancing
 
 class PortfolioRebalancer(
+    portfolioDesign: PortfolioDesign,
+    portfolioSnapshot: PortfolioSnapshot,
+    bidAskCostFractionOfNAV: Double,
+    maxAllowedDeviation: Double,
+    perETFTradingCost: Double,
+    accumulatedExDividends: Double,
+    accumulatedCash: Double,
     firstEstimateQuantitiesToAcquireCalculator: FirstEstimateQuantitiesToAcquireCalculator =
       new FirstEstimateQuantitiesToAcquireCalculator)
   extends PortfolioValueCalculation {
 
-  def maxQuantities(
-      portfolioDesign: PortfolioDesign,
-      portfolioSnapshot: PortfolioSnapshot,
-      bidAskCostFractionOfNAV: Double,
-      maxAllowedDeviation: Double,
-      perETFTradingCost: Double,
-      accumulatedExDividends: Double,
-      accumulatedCash: Double):Seq[AddnlQty] = {
+  private val firstEstimateQuantitiesToAcquire =
+    firstEstimateQuantitiesToAcquireCalculator
+    .firstEstimateQuantitiesToAcquire(
+        portfolioDesign,
+        portfolioSnapshot,
+        bidAskCostFractionOfNAV,
+        maxAllowedDeviation,
+        perETFTradingCost,
+        accumulatedExDividends,
+        accumulatedCash
+    )
 
-    val firstEstimateQuantitiesToAcquire =
-      firstEstimateQuantitiesToAcquireCalculator
-      .firstEstimateQuantitiesToAcquire(
-          portfolioDesign,
-          portfolioSnapshot,
-          bidAskCostFractionOfNAV,
-          maxAllowedDeviation,
-          perETFTradingCost,
-          accumulatedExDividends,
-          accumulatedCash
-      )
+  def maxQuantities:Seq[AddnlQty] = {
+
     firstEstimateQuantitiesToAcquire.map { fEQTA =>
       val maybeNAV =
         portfolioSnapshot.sameDateUniqueCodesETFDatas.find(eTFData => eTFData.eTFCode == fEQTA.eTFCode).map(_.nAV)
@@ -40,25 +41,8 @@ class PortfolioRebalancer(
     }
   }
 
-  def additionalQuantities(
-      portfolioDesign: PortfolioDesign,
-      portfolioSnapshot: PortfolioSnapshot,
-      bidAskCostFractionOfNAV: Double,
-      maxAllowedDeviation: Double,
-      perETFTradingCost: Double,
-      accumulatedExDividends: Double,
-      accumulatedCash: Double):Seq[Seq[AddnlQty]] = {
-
-    val maxQtys =
-      maxQuantities(
-        portfolioDesign,
-        portfolioSnapshot,
-        bidAskCostFractionOfNAV,
-        maxAllowedDeviation,
-        perETFTradingCost,
-        accumulatedExDividends,
-        accumulatedCash)
-    maxQtys.foldLeft[Seq[Seq[AddnlQty]]](Seq()) { case (acc, maxQ) =>
+  def additionalQuantities:Seq[Seq[AddnlQty]] =
+    maxQuantities.foldLeft[Seq[Seq[AddnlQty]]](Seq()) { case (acc, maxQ) =>
       if (acc.isEmpty) {
         (0 to maxQ.quanitity map { qty => Seq(AddnlQty(maxQ.eTFCode, qty)) }).toSeq
       } else
@@ -66,7 +50,6 @@ class PortfolioRebalancer(
           acc.map { accumulated => accumulated :+ subsequent }
         }
     }
-  }
 
   def maxAbsDeviation(
     portfolioDesign: PortfolioDesign,
@@ -92,23 +75,17 @@ class PortfolioRebalancer(
 
    }
 
-  def finalQuantities(
-    portfolioDesign: PortfolioDesign,
-    portfolioSnapshot: PortfolioSnapshot,
-    firstEstimateQuantitiesToAcquire: PortfolioQuantitiesToAcquire,
-    additionalQuantities: Seq[Seq[AddnlQty]],
-    accumulatedExDividends: Double,
-    accumulatedCash: Double):FinalPortfolioQuantitiesToHave = {
+  def finalQuantities:FinalPortfolioQuantitiesToHave = {
 
     lazy val finalPortfolioQuantitiesToHaveDefault = portfolioSnapshot.sameDateUniqueCodesETFDatas.map { eTFData =>
       FinalPortfolioQuantityToHave(eTFData.eTFCode, eTFData.quantity.toInt)
     }
 
     val initialCashRemaining =
-      cashRemaining(firstEstimateQuantitiesToAcquire.quantitiesToAcquire) + accumulatedCash + accumulatedExDividends
+      cashRemaining(firstEstimateQuantitiesToAcquire) + accumulatedCash + accumulatedExDividends
 
     additionalQuantities.map { additionalQuantities =>
-      val newQuantitiesToAcquire = firstEstimateQuantitiesToAcquire + additionalQuantities
+      val newQuantitiesToAcquire = PortfolioQuantitiesToAcquire(firstEstimateQuantitiesToAcquire) + additionalQuantities
       val newCashRemaining =
         cashRemaining(newQuantitiesToAcquire.quantitiesToAcquire) + accumulatedCash + accumulatedExDividends
       val maxActualDeviation = maxAbsDeviation(portfolioDesign, portfolioSnapshot, newQuantitiesToAcquire)
@@ -116,8 +93,7 @@ class PortfolioRebalancer(
         val initialQuantity =
           portfolioSnapshot.sameDateUniqueCodesETFDatas.find(_.eTFCode == additionalQuantity.eTFCode).fold(0)(_.quantity.toInt)
         val firstEstimatedQuantityToAcquire =
-          firstEstimateQuantitiesToAcquire.quantitiesToAcquire
-          .find(_.eTFCode == additionalQuantity.eTFCode).fold(0)(_.quantityToAcquire)
+          firstEstimateQuantitiesToAcquire.find(_.eTFCode == additionalQuantity.eTFCode).fold(0)(_.quantityToAcquire)
         val finalQuantity = initialQuantity + firstEstimatedQuantityToAcquire + additionalQuantity.quanitity
         FinalPortfolioQuantityToHave(additionalQuantity.eTFCode, finalQuantity)
       }

@@ -8,11 +8,17 @@ class PortfolioRebalancerUTest extends FlatSpec with ShouldMatchers with Portfol
 
   trait Fixture {
     val mockFirstEstimatesCalculator = mock[FirstEstimateQuantitiesToAcquireCalculator]
-    val pr = new PortfolioRebalancer(mockFirstEstimatesCalculator)
   }
 
   "The max quantities generator" should "calculate the maximum quantity of each ETF that can be purchased with the" +
   "remaining cash" in new EstimatedQuantitiesToAcquire with AdditionalQuantitiesFixture with Fixture {
+
+    (mockFirstEstimatesCalculator.firstEstimateQuantitiesToAcquire _)
+    .expects(portfolioDesign, portfolioSnapshot, 0.0011, 0d, 10d, 0d, 0d)
+    .returning(expectedFirstEstimateQuantitiesAllTrades)
+    val prAllMatch =
+      new PortfolioRebalancer(portfolioDesign, portfolioSnapshot, 0.0011, 0d, 10d, 0d, 0d, mockFirstEstimatesCalculator)
+
     val firstEstimateQuantitiesAllTradesWithNonMatch = Seq(
       PortfolioQuantityToAcquire(eTFNotInSnapshot, 74, round(20 * (1 + 0.0011)), 74.91759),
       PortfolioQuantityToAcquire(eTFB, 66, round(30 * (1 + 0.0011)), 66.59341),
@@ -21,17 +27,15 @@ class PortfolioRebalancerUTest extends FlatSpec with ShouldMatchers with Portfol
     )
     val expectedOneNotMatched = Seq(AddnlQty(eTFNotInSnapshot, 0), AddnlQty(eTFB, 4), AddnlQty(eTFC, 0), AddnlQty(eTFD, 0))
 
-    (mockFirstEstimatesCalculator.firstEstimateQuantitiesToAcquire _)
-    .expects(portfolioDesign, portfolioSnapshot, 0.0011, 0d, 10d, 0d, 0d)
-    .returning(expectedFirstEstimateQuantitiesAllTrades)
-    pr.maxQuantities(portfolioDesign, portfolioSnapshot, 0.0011, 0d, 10d, 0d, 0d) should
-      contain theSameElementsAs expectedAdditionalQuantitiesAllMatch
+    prAllMatch.maxQuantities should contain theSameElementsAs expectedAdditionalQuantitiesAllMatch
 
     (mockFirstEstimatesCalculator.firstEstimateQuantitiesToAcquire _)
     .expects(portfolioDesign, portfolioSnapshot, 0.0011, 0d, 10d, 0d, 0d)
     .returning(firstEstimateQuantitiesAllTradesWithNonMatch)
-    pr.maxQuantities(portfolioDesign, portfolioSnapshot, 0.0011, 0d, 10d, 0d, 0d) should
-      contain theSameElementsAs expectedOneNotMatched
+
+    val prOneNotMatched =
+      new PortfolioRebalancer(portfolioDesign, portfolioSnapshot, 0.0011, 0d, 10d, 0d, 0d, mockFirstEstimatesCalculator)
+    prOneNotMatched.maxQuantities should contain theSameElementsAs expectedOneNotMatched
   }
 
   it should "calculate the correct max quantities for the first trades" in new EstimatedQuantitiesToAcquire with Fixture
@@ -39,12 +43,15 @@ class PortfolioRebalancerUTest extends FlatSpec with ShouldMatchers with Portfol
     (mockFirstEstimatesCalculator.firstEstimateQuantitiesToAcquire _)
     .expects(portfolioDesign, portfolioSnapshotZeroQuantity, 0.0011, 0d, 10d, 0d, 10000d)
     .returning(expectedFirstEstimateQuantitiesFirstTrades)
-    pr.maxQuantities(portfolioDesign, portfolioSnapshotZeroQuantity, 0.0011, 0d, 10d, 0d, 10000d) should
-      contain theSameElementsAs expectedAdditionalQuantitiesFirstTrades
+    val pr =
+      new PortfolioRebalancer(portfolioDesign, portfolioSnapshotZeroQuantity, 0.0011, 0d, 10d, 0d, 10000d,
+        mockFirstEstimatesCalculator)
+
+    pr.maxQuantities should contain theSameElementsAs expectedAdditionalQuantitiesFirstTrades
   }
 
   "The additional quantities to acquire generator" should "generate and exhaustive list of possible additional " +
-  "quantities" in new AdditionalQuantitiesFixture with Fixture with EstimatedQuantitiesToAcquire{
+  "quantities" in new AdditionalQuantitiesFixture with Fixture with EstimatedQuantitiesToAcquire {
 
     val allMatchReverse = Seq(AddnlQty(eTFD, 0), AddnlQty(eTFC, 0), AddnlQty(eTFB, 2), AddnlQty(eTFA, 3))
     val expectedReverse = Seq(
@@ -65,12 +72,21 @@ class PortfolioRebalancerUTest extends FlatSpec with ShouldMatchers with Portfol
     (mockFirstEstimatesCalculator.firstEstimateQuantitiesToAcquire _)
     .expects(portfolioDesign, portfolioSnapshot, 0.0011, 0d, 10d, 0d, 0d)
     .returning(expectedFirstEstimateQuantitiesAllTrades)
-    pr.additionalQuantities(portfolioDesign, portfolioSnapshot, 0.0011, 0d, 10d, 0d, 0d) should
-      contain theSameElementsAs expectedAdditionalQuantitiesFull
+    val pr =
+      new PortfolioRebalancer(portfolioDesign, portfolioSnapshot, 0.0011, 0d, 10d, 0d, 0d,
+                              mockFirstEstimatesCalculator)
+    pr.additionalQuantities should contain theSameElementsAs expectedAdditionalQuantitiesFull
   }
 
   "The max absolute deviation from desired weights calculator" should "return the maximum deviation from the desired " +
-  "weights of the given quantities to purchase" in new AdditionalQuantitiesFixture with Fixture {
+  "weights of the given quantities to purchase" in new AdditionalQuantitiesFixture with Fixture
+  with EstimatedQuantitiesToAcquire{
+
+    (mockFirstEstimatesCalculator.firstEstimateQuantitiesToAcquire _)
+    .expects(portfolioDesign, portfolioSnapshot, 0.0011, 0d, 10d, 0d, 0d)
+    .returning(expectedFirstEstimateQuantitiesAllTrades)
+    val pr =
+      new PortfolioRebalancer(portfolioDesign, portfolioSnapshot, 0.0011, 0d, 10d, 0d, 0d, mockFirstEstimatesCalculator)
 
     round(pr.maxAbsDeviation(
       portfolioDesign,
@@ -96,17 +112,20 @@ class PortfolioRebalancerUTest extends FlatSpec with ShouldMatchers with Portfol
     val expectedChosenOneTrade =
       FinalPortfolioQuantitiesToHave(expectedFinalQuantitiesOneTrade, 3.23872, 0.05020, additionalQuantitiesChosenOneTrade)
 
-    val actualChosenAllTrades = pr.finalQuantities(
-      portfolioDesign,
-      portfolioSnapshot,
-      PortfolioQuantitiesToAcquire(expectedFirstEstimateQuantitiesAllTrades),
-      Seq(additionalQuantitiesChosenAllTrades), 0d, 0d)
+    (mockFirstEstimatesCalculator.firstEstimateQuantitiesToAcquire _)
+    .expects(portfolioDesign, portfolioSnapshot, 0.0011, 0d, 10d, 0d, 0d)
+    .returning(expectedFirstEstimateQuantitiesAllTrades)
+    val prAllTrades =
+      new PortfolioRebalancer(portfolioDesign, portfolioSnapshot, 0.0011, 0d, 10d, 0d, 0d, mockFirstEstimatesCalculator)
 
-    val actualChosenOneTrade = pr.finalQuantities(
-      portfolioDesign,
-      portfolioSnapshot,
-      PortfolioQuantitiesToAcquire(expectedFirstEstimateQuantitiesOneTrade),
-      Seq(additionalQuantitiesChosenOneTrade), 0d, 0d)
+    (mockFirstEstimatesCalculator.firstEstimateQuantitiesToAcquire _)
+    .expects(portfolioDesign, portfolioSnapshot, 0.0011, 0.05, 10d, 0d, 0d)
+    .returning(expectedFirstEstimateQuantitiesOneTrade)
+    val prOneTrade =
+      new PortfolioRebalancer(portfolioDesign, portfolioSnapshot, 0.0011, 0.05, 10d, 0d, 0d, mockFirstEstimatesCalculator)
+
+    val actualChosenAllTrades = prAllTrades.finalQuantities
+    val actualChosenOneTrade = prOneTrade.finalQuantities
 
     actualChosenAllTrades.copy(
       cashRemaining = round(actualChosenAllTrades.cashRemaining, 2),
@@ -117,15 +136,6 @@ class PortfolioRebalancerUTest extends FlatSpec with ShouldMatchers with Portfol
       cashRemaining = round(actualChosenOneTrade.cashRemaining, 2),
       maxActualDeviation = round(actualChosenOneTrade.maxActualDeviation)) shouldEqual
       expectedChosenOneTrade.copy(cashRemaining = round(expectedChosenOneTrade.cashRemaining, 2))
-
-    pr.finalQuantities(
-      portfolioDesign,
-      portfolioSnapshot,
-      PortfolioQuantitiesToAcquire(expectedFirstEstimateQuantitiesOneTrade),
-      Seq(), 0d, 0d) shouldEqual FinalPortfolioQuantitiesToHave(portfolioSnapshot.sameDateUniqueCodesETFDatas.map { eTFData =>
-          FinalPortfolioQuantityToHave(eTFData.eTFCode, eTFData.quantity.toInt)
-        }, pr.cashRemaining(PortfolioQuantitiesToAcquire(expectedFirstEstimateQuantitiesOneTrade).quantitiesToAcquire),
-          0, Seq())
 
   }
 
@@ -149,13 +159,13 @@ class PortfolioRebalancerUTest extends FlatSpec with ShouldMatchers with Portfol
     (mockFirstEstimatesCalculator.firstEstimateQuantitiesToAcquire _)
     .expects(portfolioDesign, portfolioSnapshotZeroQuantity, 0.0011, 0d, 10d, 0d, 10000d)
     .returning(expectedFirstEstimateQuantitiesFirstTrades)
-    val additionalQuantities =
-      pr.additionalQuantities(portfolioDesign, portfolioSnapshotZeroQuantity, 0.0011, 0d, 10d, 0d, 10000d)
-    val notRounded = pr.finalQuantities(
-      portfolioDesign,
-      portfolioSnapshotZeroQuantity,
-      PortfolioQuantitiesToAcquire(expectedFirstEstimateQuantitiesFirstTrades),
-      additionalQuantities, 0d, 10000d)
+
+    val pr =
+      new PortfolioRebalancer(portfolioDesign, portfolioSnapshotZeroQuantity, 0.0011, 0d, 10d, 0d, 10000d,
+        mockFirstEstimatesCalculator)
+
+    val additionalQuantities = pr.additionalQuantities
+    val notRounded = pr.finalQuantities
     notRounded.copy(
       cashRemaining = round(notRounded.cashRemaining),
       maxActualDeviation = round(notRounded.maxActualDeviation)) shouldEqual
@@ -165,6 +175,11 @@ class PortfolioRebalancerUTest extends FlatSpec with ShouldMatchers with Portfol
   "The cash remaining calculator" should "correctly calculate the cash remaining after trades" in
   new EstimatedQuantitiesToAcquire with Fixture {
     val expected = 53.29385
+    (mockFirstEstimatesCalculator.firstEstimateQuantitiesToAcquire _)
+    .expects(portfolioDesign, portfolioSnapshot, 0.0011, 0d, 10d, 0d, 0d)
+    .returning(expectedFirstEstimateQuantitiesAllTrades)
+    val pr =
+      new PortfolioRebalancer(portfolioDesign, portfolioSnapshot, 0.0011, 0d, 10d, 0d, 0d, mockFirstEstimatesCalculator)
     round(pr.
       cashRemaining(
         PortfolioQuantitiesToAcquire(expectedFirstEstimateQuantitiesOneTrade).quantitiesToAcquire)) shouldEqual expected
