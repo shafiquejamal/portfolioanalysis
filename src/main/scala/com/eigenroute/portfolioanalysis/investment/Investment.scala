@@ -4,18 +4,15 @@ import com.eigenroute.portfolioanalysis.investment.InvestmentPeriod._
 import com.eigenroute.portfolioanalysis.rebalancing._
 import org.apache.spark.sql.{SparkSession, Dataset}
 
-case class RebalancedPortfolio(ds: Dataset[ETFDataPlus], accumulatedExDiv: Double, accumulatedCash: Double)
-
 class Investment(
     investmentPeriod: InvestmentPeriod,
     rebalancingInterval: RebalancingInterval,
-    initialInvestment: Double,
-    perTransactionTradingCost: Double,
-    bidAskCostFractionOfNav: Double,
+    initialInvestment: BigDecimal,
+    perTransactionTradingCost: BigDecimal,
+    bidAskCostFractionOfNav: BigDecimal,
     portfolioDesign: PortfolioDesign,
-    maxAllowedDeviation: Double,
+    maxAllowedDeviation: BigDecimal,
     commonDatesDataset:Dataset[ETFDataPlus]) {
-
 
   val totalNumberOfRebalancingIntervals: Int = lengthInMonths(investmentPeriod) / rebalancingInterval.months
   val sortedDatasetsSplitByRebalancingPeriod: Seq[Dataset[ETFDataPlus]] =
@@ -31,46 +28,47 @@ class Investment(
   def run()(sparkSession: SparkSession): RebalancedPortfolio = {
 
     import sparkSession.implicits._
-    val portfolioRebalancer = new PortfolioRebalancer()
 
-    val rebalanced:RebalancedPortfolio =
-      sortedDatasetsSplitByRebalancingPeriod
-      .foldLeft[RebalancedPortfolio](RebalancedPortfolio(Seq[ETFDataPlus]().toDS, 0d, initialInvestment))
-        { case (acc, datasetForRebalancingPeriod) =>
+    sortedDatasetsSplitByRebalancingPeriod
+      .foldLeft[RebalancedPortfolio](RebalancedPortfolio(Seq[ETFDataPlus]().toDS, Seq(), 0d, initialInvestment))
+        { case (rebalancedPortfolio, datasetForRebalancingPeriod) =>
+
+      val datasetForRebalancingPeriodWithQuantitiesFromPrevious = datasetForRebalancingPeriod.map { eTFData =>
+        eTFData.copy(
+          quantity =
+            rebalancedPortfolio.quantitiesChosen.find(_.eTFCode == eTFData.eTFCode).fold(0d){ portfolioQuantityToHave =>
+              portfolioQuantityToHave.quantity.toDouble},
+          cash = rebalancedPortfolio.accumulatedCash
+          )
+      }.persist()
 
       val commonDatesDatasets = portfolioDesign.eTFSelections.map { selection =>
-        datasetForRebalancingPeriod.filter(_.eTFCode == selection.eTFCode)
+        datasetForRebalancingPeriodWithQuantitiesFromPrevious.filter(_.eTFCode == selection.eTFCode)
       }
-      val portfolioSnapshot = PortfolioSnapshot(portfolioDesign, commonDatesDatasets)
-      val valueDifferences =
-        new ValueDifferencesCalculator().valueDifferences(
-            portfolioDesign,
-            portfolioSnapshot,
-            maxAllowedDeviation,
-            perTransactionTradingCost,
-            acc.accumulatedExDiv,
-            acc.accumulatedCash)
-      val firstEstimatedQuantitiesToAcquire = null
-//        new FirstEstimateQuantitiesToAcquireCalculator().firstEstimateQuantitiesToAcquire(
-//            portfolioDesign,
-//            portfolioSnapshot,
-//            valueDifferences,
-//            bidAskCostFractionOfNav)
-      val maxQuantities =
-        portfolioRebalancer
-        .maxQuantities(firstEstimatedQuantitiesToAcquire, portfolioSnapshot, acc.accumulatedExDiv, acc.accumulatedCash)
-      val additionalQuantities = portfolioRebalancer.additionalQuantities(maxQuantities)
-      val finalQuanitities =
-        portfolioRebalancer.finalQuantities(
-            portfolioDesign,
-            portfolioSnapshot,
-            PortfolioQuantitiesToAcquire(firstEstimatedQuantitiesToAcquire),
-            additionalQuantities,
-            acc.accumulatedExDiv,
-            acc.accumulatedCash)
-      val accumulatedExDiv = datasetForRebalancingPeriod.map(_.exDividend).collect().sum
-        RebalancedPortfolio(datasetForRebalancingPeriod.union(acc.ds), accumulatedExDiv, finalQuanitities.cashRemaining)
+
+      val finalQuantitiesAndCash =
+        new PortfolioRebalancer(
+          portfolioDesign,
+          PortfolioSnapshot(portfolioDesign, commonDatesDatasets),
+          bidAskCostFractionOfNav,
+          maxAllowedDeviation,
+          perTransactionTradingCost,
+          rebalancedPortfolio.accumulatedExDiv,
+          rebalancedPortfolio.accumulatedCash).finalQuantities
+      val finalQuantities = finalQuantitiesAndCash.quantitiesToHave
+      val updatedDatasetForRebalancingPeriod = datasetForRebalancingPeriodWithQuantitiesFromPrevious.map { eTFData =>
+        eTFData.copy(
+          quantity = finalQuantities.find(_.eTFCode == eTFData.eTFCode).fold(0d){ portfolioQuantityToHave =>
+            portfolioQuantityToHave.quantity.toDouble},
+          cash = finalQuantitiesAndCash.cashRemaining)
+      }
+      val accumulatedExDiv = datasetForRebalancingPeriod.map(_.exDividend.toDouble).collect().sum
+
+      RebalancedPortfolio(
+        updatedDatasetForRebalancingPeriod.union(rebalancedPortfolio.rebalancedDataset),
+        finalQuantitiesAndCash.quantitiesToHave,
+        accumulatedExDiv,
+        finalQuantitiesAndCash.cashRemaining)
     }
-    rebalanced
   }
 }

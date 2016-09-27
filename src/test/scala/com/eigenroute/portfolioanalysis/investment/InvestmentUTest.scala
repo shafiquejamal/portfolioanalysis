@@ -11,16 +11,16 @@ class InvestmentUTest extends FlatSpec with ShouldMatchers with PortfolioFixture
   "The number of rebalancing opportunities" should "be calculated as investment period in months divided by rebalancing " +
   "period on months" in new InvestmentFixture {
     val investmentMonthlyRebalancing =
-      new Investment(investmentPeriod, Monthly, 10040d, 10d, 0.0011, portfolioDesign, 0d, sortedCommonDatesDataset)
+      new Investment(investmentPeriod, Monthly, 10040d, 10d, 0.0011, portfolioDesign, 0.05, sortedCommonDatesDataset)
 
     val investmentQuarterlyRebalancing =
-      new Investment(investmentPeriod, Quarterly, 10040d, 10d, 0.0011, portfolioDesign, 0d, sortedCommonDatesDataset)
+      new Investment(investmentPeriod, Quarterly, 10040d, 10d, 0.0011, portfolioDesign, 0.05, sortedCommonDatesDataset)
 
     val investmentSemiAnnuallyRebalancing =
-      new Investment(investmentPeriod, SemiAnnually, 10040d, 10d, 0.0011, portfolioDesign, 0d, sortedCommonDatesDataset)
+      new Investment(investmentPeriod, SemiAnnually, 10040d, 10d, 0.0011, portfolioDesign, 0.05, sortedCommonDatesDataset)
 
     val investmentAnnualRebalancing =
-      new Investment(investmentPeriod, Annually, 10040d, 10d, 0.0011, portfolioDesign, 0d, sortedCommonDatesDataset)
+      new Investment(investmentPeriod, Annually, 10040d, 10d, 0.0011, portfolioDesign, 0.05, sortedCommonDatesDataset)
 
     investmentMonthlyRebalancing.totalNumberOfRebalancingIntervals shouldEqual 36
     val datasetSplitIntoRebalancingIntervals =
@@ -36,9 +36,8 @@ class InvestmentUTest extends FlatSpec with ShouldMatchers with PortfolioFixture
 
     investmentAnnualRebalancing.totalNumberOfRebalancingIntervals shouldEqual 3
     investmentAnnualRebalancing.sortedDatasetsSplitByRebalancingPeriod.length shouldEqual 3
-
-    val temp = investmentAnnualRebalancing.run()(spark).ds.collect()
-    temp
   }
+
+
 
 }
