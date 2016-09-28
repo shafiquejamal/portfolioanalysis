@@ -2,7 +2,7 @@ package com.eigenroute.portfolioanalysis.investment
 
 import com.eigenroute.portfolioanalysis.investment.InvestmentPeriod._
 import com.eigenroute.portfolioanalysis.rebalancing._
-import org.apache.spark.sql.{SparkSession, Dataset}
+import org.apache.spark.sql.{Dataset, SparkSession}
 
 class Investment(
     investmentPeriod: InvestmentPeriod,
@@ -36,7 +36,8 @@ class Investment(
       val datasetForRebalancingPeriodWithQuantitiesFromPrevious = datasetForRebalancingPeriod.map { eTFData =>
         eTFData.copy(
           quantity =
-            rebalancedPortfolio.quantitiesChosen.find(_.eTFCode == eTFData.eTFCode).fold(0d){ portfolioQuantityToHave =>
+            rebalancedPortfolio.newQuantitiesChosenForThisRebalancing
+            .find(_.eTFCode == eTFData.eTFCode).fold(0d) { portfolioQuantityToHave =>
               portfolioQuantityToHave.quantity.toDouble},
           cash = rebalancedPortfolio.accumulatedCash
           )
@@ -66,7 +67,7 @@ class Investment(
 
       RebalancedPortfolio(
         updatedDatasetForRebalancingPeriod.union(rebalancedPortfolio.rebalancedDataset),
-        finalQuantitiesAndCash.quantitiesToHave,
+        finalQuantities,
         accumulatedExDiv,
         finalQuantitiesAndCash.cashRemaining)
     }

@@ -4,8 +4,8 @@ import com.eigenroute.portfolioanalysis.rebalancing.{ETFDataPlus, FinalPortfolio
 import org.apache.spark.sql.Dataset
 
 case class RebalancedPortfolio(
-  rebalancedDataset: Dataset[ETFDataPlus],
-  quantitiesChosen: Seq[FinalPortfolioQuantityToHave],
-  accumulatedExDiv: BigDecimal,
-  accumulatedCash: BigDecimal)
+    rebalancedDataset: Dataset[ETFDataPlus],
+    newQuantitiesChosenForThisRebalancing: Seq[FinalPortfolioQuantityToHave],
+    accumulatedExDiv: BigDecimal,
+    accumulatedCash: BigDecimal)
 

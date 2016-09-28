@@ -32,5 +32,3 @@ object ETFDataPlus {
     }
   }
 }
-
-case class ETFQuantity(eTFCode: ETFCode, quantity: BigDecimal)
