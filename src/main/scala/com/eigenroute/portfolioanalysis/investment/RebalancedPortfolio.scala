@@ -7,5 +7,6 @@ case class RebalancedPortfolio(
     rebalancedDataset: Dataset[ETFDataPlus],
     newQuantitiesChosenForThisRebalancing: Seq[FinalPortfolioQuantityToHave],
     accumulatedExDiv: BigDecimal,
-    accumulatedCash: BigDecimal)
+    accumulatedCash: BigDecimal,
+    liquidatedValue: BigDecimal = 0)
 
