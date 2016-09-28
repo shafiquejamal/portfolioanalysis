@@ -25,6 +25,9 @@ class Investment(
         eTFData.asOfDate.getTime < endOfPeriod.getMillis)
       }.toSeq
 
+  val temp1 = sortedDatasetsSplitByRebalancingPeriod.map(_.collect().toList)
+  val temp2 = temp1
+
   def run()(sparkSession: SparkSession): RebalancedPortfolio = {
 
     import sparkSession.implicits._

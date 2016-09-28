@@ -2,8 +2,10 @@ package com.eigenroute.portfolioanalysis.investment
 
 import com.eigenroute.portfolioanalysis.PortfolioFixture
 import com.eigenroute.portfolioanalysis.investment.RebalancingInterval.{Annually, Monthly, Quarterly, SemiAnnually}
-import com.eigenroute.portfolioanalysis.rebalancing.FinalPortfolioQuantityToHave
+import com.eigenroute.portfolioanalysis.rebalancing.{ETFDataPlus, FinalPortfolioQuantityToHave}
 import com.eigenroute.portfolioanalysis.util.RichJoda._
+import org.apache.spark.sql.Dataset
+import org.joda.time.DateTime
 import org.scalatest.{FlatSpec, ShouldMatchers}
 
 class InvestmentATest extends FlatSpec with ShouldMatchers with PortfolioFixture {
@@ -40,18 +42,14 @@ class InvestmentATest extends FlatSpec with ShouldMatchers with PortfolioFixture
     investmentAnnualRebalancing.sortedDatasetsSplitByRebalancingPeriod.length shouldEqual 3
   }
 
-  "Running the simulation" should "create a dataset with the correct quantities" in new InvestmentFixture {
+  "The simulation" should "create a dataset with the correct quantities" in new InvestmentFixture {
     val investmentPeriodOneYear = InvestmentPeriod(startDate, startDate.plusYears(1))
     val investment =
-      new Investment(investmentPeriodOneYear, Quarterly, 10040, 10, 0.0011, portfolioDesign, 0, investmentInputDataset)
-    val expectedRebalancedData = expectedRebalancedPortfolio.collect().toList.filter { eTFData =>
-      eTFData.asOfDate.isBefore(startDatePlus12months)
-    }.map { eTFData => eTFData.copy(cash = round(eTFData.cash)) }
-
+      new Investment(
+        investmentPeriodOneYear, Quarterly, 10040, 10, 0.0011, portfolioDesign, 0, investmentInputDatasetQuarterly)
+    val expectedRebalancedData = filterAndRound(expectedRebalancedPortfolioQuarterly, startDatePlus12months)
     val rebalancedPortfolio = investment.run()(spark)
-    val actualRebalancedData = rebalancedPortfolio.rebalancedDataset.collect().toList.map { eTFData =>
-      eTFData.copy(cash = round(eTFData.cash))
-    }
+    val actualRebalancedData = collectAndRound(rebalancedPortfolio.rebalancedDataset)
 
     actualRebalancedData should contain theSameElementsAs expectedRebalancedData
     rebalancedPortfolio.accumulatedExDiv shouldEqual 20
@@ -64,6 +62,33 @@ class InvestmentATest extends FlatSpec with ShouldMatchers with PortfolioFixture
     )
   }
 
+  it should "rebalance correctly when the period is longer than one year and the max allowed deviation is greater than " +
+  "zero" in {
 
+    val investmentPeriodThreeYears = InvestmentPeriod(startDate, startDate.plusYears(3))
+    val investment =
+      new Investment(
+        investmentPeriodThreeYears, SemiAnnually, 10040, 10, 0.0011, portfolioDesign, 0.05,
+        investmentInputDatasetSemiAnnually)
+    val expectedRebalancedData = filterAndRound(expectedRebalancedPortfolioSemiAnnually, startDatePlus36months)
+    val rebalancedPortfolio = investment.run()(spark)
+    val actualRebalancedData = collectAndRound(rebalancedPortfolio.rebalancedDataset)
 
+    actualRebalancedData should contain theSameElementsAs expectedRebalancedData
+    rebalancedPortfolio.accumulatedExDiv shouldEqual 1.75
+    round(rebalancedPortfolio.accumulatedCash) shouldEqual round(2.51041084806712616122265507941400)
+    rebalancedPortfolio.newQuantitiesChosenForThisRebalancing should contain theSameElementsAs Seq(
+      FinalPortfolioQuantityToHave(eTFA, 94),
+      FinalPortfolioQuantityToHave(eTFB, 301),
+      FinalPortfolioQuantityToHave(eTFC, 272),
+      FinalPortfolioQuantityToHave(eTFD, 57)
+    )
+  }
+
+  private def roundCashValue(eTFData: ETFDataPlus) = eTFData.copy(cash = round(eTFData.cash))
+
+  private def collectAndRound(dataset: Dataset[ETFDataPlus]) = dataset.collect().toList.map(roundCashValue)
+
+  private def filterAndRound(dataset: Dataset[ETFDataPlus], endDate :DateTime) =
+    dataset.collect().toList.filter { eTFData => eTFData.asOfDate.isBefore(endDate)}.map(roundCashValue)
 }
