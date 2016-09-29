@@ -1,7 +1,10 @@
 package com.eigenroute.portfolioanalysis.investment
 
+import com.eigenroute.portfolioanalysis.DatasetFixture._
 import com.eigenroute.portfolioanalysis.{DatasetFixture, PortfolioFixture}
+import org.joda.time.DateTime
 import org.scalatest.{FlatSpec, ShouldMatchers}
+import com.eigenroute.portfolioanalysis.util.RichJoda._
 
 class InvestmentPeriodsCreatorUTest extends FlatSpec with ShouldMatchers with PortfolioFixture {
 
@@ -16,8 +19,18 @@ class InvestmentPeriodsCreatorUTest extends FlatSpec with ShouldMatchers with Po
     endDates should contain(commonEndDate)
   }
 
+  it should "not contain dates that are not in the common dates dataset" in {
+
+    val dateToOmit: DateTime = commonStartDate.plusDays(10)
+    val iPCWithoutSomeDates =
+      new InvestmentPeriodsCreator(portfolioDesign, sortedCommonDatesDataset.filter(!_.asOfDate.isEqual(dateToOmit)), 10)
+    val investmentPeriods = iPCWithoutSomeDates.create
+
+    investmentPeriods.map(_.startDate) should not contain dateToOmit
+  }
+
   "The earliest date retriever" should "return the earliest date that is common to all the chosen ETFs in the dataset" in {
-    iPC.earliestDate shouldEqual commonStartDate
+    iPC.maybeEarliestDate should contain(commonStartDate)
     iPC.maybeLatestDate should contain(commonEndDate)
   }
 

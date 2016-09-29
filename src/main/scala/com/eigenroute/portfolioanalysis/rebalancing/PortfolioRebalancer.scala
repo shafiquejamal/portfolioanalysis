@@ -45,9 +45,9 @@ class PortfolioRebalancer(
 
   def additionalQuantities:Seq[Seq[AddnlQty]] =
     maxQuantities.foldLeft[Seq[Seq[AddnlQty]]](Seq()) { case (acc, maxQ) =>
-      if (acc.isEmpty) {
+      if (acc.isEmpty)
         (0 to maxQ.quanitity map { qty => Seq(AddnlQty(maxQ.eTFCode, qty)) }).toSeq
-      } else
+      else
         (0 to maxQ.quanitity map { qty => AddnlQty(maxQ.eTFCode, qty) }).toSeq.flatMap { subsequent =>
           acc.map { accumulated => accumulated :+ subsequent }
         }
@@ -114,9 +114,9 @@ class PortfolioRebalancer(
   def cashRemaining(quantitiesToAcquire: Seq[PortfolioQuantityToAcquire]): BigDecimal = {
 
    val cashNeededForEachTransaction =
-   quantitiesToAcquire.map { initialQuantityToAcquire =>
+    quantitiesToAcquire.map { initialQuantityToAcquire =>
       initialQuantityToAcquire.quantityToAcquire * initialQuantityToAcquire.effectivePrice
-                                 }
+    }
     -1*cashNeededForEachTransaction.sum
   }
 }

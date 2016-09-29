@@ -76,7 +76,6 @@ class InvestmentATest extends FlatSpec with ShouldMatchers with PortfolioFixture
     val expectedRebalancedData = filterAndRound(expectedRebalancedPortfolioSemiAnnually, startDatePlus36months)
     val rebalancedPortfolio = investment.rebalancePortfolio
     val actualRebalancedData = collectAndRound(rebalancedPortfolio.rebalancedDataset)
-
     actualRebalancedData should contain theSameElementsAs expectedRebalancedData
     rebalancedPortfolio.accumulatedExDiv shouldEqual 1.75
     round(rebalancedPortfolio.accumulatedCash) shouldEqual round(2.51041084806712616122265507941400)

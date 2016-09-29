@@ -49,11 +49,11 @@ class Investment(
           )
       }.persist()
 
-      val commonDatesDatasetsBeforeRebalancing = portfolioDesign.eTFSelections.map { selection =>
+      val commonDatesDatasetsBeforeRebalancing: Seq[Dataset[ETFDataPlus]] = portfolioDesign.eTFSelections.map { selection =>
         datasetForRebalancingPeriodWithQuantitiesFromPrevious.filter(_.eTFCode == selection.eTFCode)
       }
 
-      val finalQuantitiesAndCash =
+      val finalQuantitiesAndCash: FinalPortfolioQuantitiesToHave =
         new PortfolioRebalancer(
           portfolioDesign,
           PortfolioSnapshot(portfolioDesign, commonDatesDatasetsBeforeRebalancing),
@@ -62,20 +62,22 @@ class Investment(
           perTransactionTradingCost,
           rebalancedPortfolio.accumulatedExDiv,
           rebalancedPortfolio.accumulatedCash).finalQuantities
-      val finalQuantities = finalQuantitiesAndCash.quantitiesToHave
-      val updatedDatasetForRebalancingPeriod = datasetForRebalancingPeriodWithQuantitiesFromPrevious.map { eTFData =>
-        eTFData.copy(
-          quantity = finalQuantities.find(_.eTFCode == eTFData.eTFCode).fold(0d){ portfolioQuantityToHave =>
-            portfolioQuantityToHave.quantity.toDouble},
-          cash = finalQuantitiesAndCash.cashRemaining)
+      val finalQuantities: Seq[FinalPortfolioQuantityToHave] = finalQuantitiesAndCash.quantitiesToHave
+      val updatedDatasetForRebalancingPeriod: Dataset[ETFDataPlus] =
+        datasetForRebalancingPeriodWithQuantitiesFromPrevious.map { eTFData =>
+          eTFData.copy(
+            quantity = finalQuantities.find(_.eTFCode == eTFData.eTFCode).fold(0d){ portfolioQuantityToHave =>
+              portfolioQuantityToHave.quantity.toDouble},
+            cash = finalQuantitiesAndCash.cashRemaining)
       }
       val accumulatedExDiv = datasetForRebalancingPeriod.map(_.exDividend.toDouble).collect().sum
 
-      lazy val commonDatesDatasetsAfterRebalancing = portfolioDesign.eTFSelections.map { selection =>
-        updatedDatasetForRebalancingPeriod.filter(_.eTFCode == selection.eTFCode)
+      lazy val commonDatesDatasetsAfterRebalancing: Seq[Dataset[ETFDataPlus]] =
+        portfolioDesign.eTFSelections.map { selection =>
+          updatedDatasetForRebalancingPeriod.filter(_.eTFCode == selection.eTFCode)
       }
 
-      val endOfPeriodSnapshot =
+      val endOfPeriodSnapshot: PortfolioSnapshot =
         if (sortedDatasetsSplitByRebalancingPeriod.reverse.headOption.fold(false){_ == datasetForRebalancingPeriod})
           PortfolioSnapshot(portfolioDesign, commonDatesDatasetsAfterRebalancing, useLatestEntry = true)
         else
