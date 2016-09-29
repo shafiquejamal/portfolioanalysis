@@ -100,9 +100,9 @@ class Investment(
         finalRebalancedPortfolio.accumulatedExDiv,
         finalRebalancedPortfolio.accumulatedCash)
 
-    val totalReturnFraction: BigDecimal = liquidatedValue / initialInvestment
+    val totalReturnFraction: BigDecimal = (liquidatedValue / initialInvestment) - 1
     val averageAnnualReturnFraction: BigDecimal =
-      math.pow((totalReturnFraction - 1).toDouble, 1d/InvestmentPeriod.lengthInYears(investmentPeriod))
+      math.pow((liquidatedValue / initialInvestment).toDouble, 1d/InvestmentPeriod.lengthInYears(investmentPeriod)) - BigDecimal(1)
 
     finalRebalancedPortfolio.copy(
       liquidatedValue = liquidatedValue,
