@@ -7,10 +7,18 @@ case class PortfolioSnapshot(sameDateUniqueCodesETFDatas: Seq[ETFDataPlus]) {
 }
 
 object PortfolioSnapshot {
-  def apply(portfolioDesign: PortfolioDesign, commonDatesDatasets: Seq[Dataset[ETFDataPlus]]): PortfolioSnapshot = {
+  def apply(
+    portfolioDesign: PortfolioDesign,
+    commonDatesDatasets: Seq[Dataset[ETFDataPlus]],
+    useLatestEntry: Boolean = false):
+  PortfolioSnapshot = {
     val earliestDateUniqueCodesETFData =
       commonDatesDatasets.map { ds =>
-        ds.head }
+        if (useLatestEntry)
+          ds.rdd.takeOrdered(1)(ETFDataPlus.reverseOrder).toList.head
+        else
+          ds.head
+      }
       .filter { eTFData =>
         portfolioDesign.eTFSelections.map(_.eTFCode).contains(eTFData.eTFCode)}
     PortfolioSnapshot(earliestDateUniqueCodesETFData)

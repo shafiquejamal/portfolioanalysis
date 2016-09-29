@@ -29,8 +29,9 @@ class Investment(
 
     import sparkSession.implicits._
 
-    sortedDatasetsSplitByRebalancingPeriod
-      .foldLeft[RebalancedPortfolio](RebalancedPortfolio(Seq[ETFDataPlus]().toDS, Seq(), 0d, initialInvestment))
+    val finalRebalancedPortfolio = sortedDatasetsSplitByRebalancingPeriod
+      .foldLeft[RebalancedPortfolio](
+        RebalancedPortfolio(Seq[ETFDataPlus]().toDS, Seq(), 0d, initialInvestment, PortfolioSnapshot(Seq())))
         { case (rebalancedPortfolio, datasetForRebalancingPeriod) =>
 
       val datasetForRebalancingPeriodWithQuantitiesFromPrevious = datasetForRebalancingPeriod.map { eTFData =>
@@ -43,14 +44,14 @@ class Investment(
           )
       }.persist()
 
-      val commonDatesDatasets = portfolioDesign.eTFSelections.map { selection =>
+      val commonDatesDatasetsBeforeRebalancing = portfolioDesign.eTFSelections.map { selection =>
         datasetForRebalancingPeriodWithQuantitiesFromPrevious.filter(_.eTFCode == selection.eTFCode)
       }
 
       val finalQuantitiesAndCash =
         new PortfolioRebalancer(
           portfolioDesign,
-          PortfolioSnapshot(portfolioDesign, commonDatesDatasets),
+          PortfolioSnapshot(portfolioDesign, commonDatesDatasetsBeforeRebalancing),
           bidAskCostFractionOfNav,
           maxAllowedDeviation,
           perTransactionTradingCost,
@@ -65,12 +66,34 @@ class Investment(
       }
       val accumulatedExDiv = datasetForRebalancingPeriod.map(_.exDividend.toDouble).collect().sum
 
-      RebalancedPortfolio(
+      lazy val commonDatesDatasetsAfterRebalancing = portfolioDesign.eTFSelections.map { selection =>
+        updatedDatasetForRebalancingPeriod.filter(_.eTFCode == selection.eTFCode)
+      }
+
+      val endOfPeriodSnapshot =
+        if (sortedDatasetsSplitByRebalancingPeriod.reverse.headOption.fold(false){_ == datasetForRebalancingPeriod})
+          PortfolioSnapshot(portfolioDesign, commonDatesDatasetsAfterRebalancing, useLatestEntry = true)
+        else
+          PortfolioSnapshot(Seq())
+
+        RebalancedPortfolio(
         updatedDatasetForRebalancingPeriod.union(rebalancedPortfolio.rebalancedDataset),
         finalQuantities,
         accumulatedExDiv,
-        finalQuantitiesAndCash.cashRemaining)
+        finalQuantitiesAndCash.cashRemaining,
+        endOfPeriodSnapshot
+      )
     }
 
+    val liquidatedValue =
+      new LiquidatedValueCalculator().liquidatedValue(
+        finalRebalancedPortfolio.endOfPeriodSnapshot,
+        bidAskCostFractionOfNav,
+        perTransactionTradingCost,
+        finalRebalancedPortfolio.accumulatedExDiv,
+        finalRebalancedPortfolio.accumulatedCash
+      )
+
+    finalRebalancedPortfolio.copy(liquidatedValue = liquidatedValue)
   }
 }

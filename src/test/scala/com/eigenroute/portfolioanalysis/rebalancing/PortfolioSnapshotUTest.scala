@@ -6,6 +6,7 @@ import com.eigenroute.portfolioanalysis.{DatasetFixture, PortfolioFixture}
 import org.joda.time.DateTime
 import org.scalatest.TryValues._
 import org.scalatest.{FlatSpec, ShouldMatchers}
+import com.eigenroute.portfolioanalysis.util.RichJoda._
 
 import scala.util.Try
 
@@ -33,12 +34,32 @@ class PortfolioSnapshotUTest extends FlatSpec with ShouldMatchers with Portfolio
       PortfolioSnapshot(
         portfolioSnapshot.sameDateUniqueCodesETFDatas.map(_.copy(
           quantity = 0d,
-          asOfDate = new Date(new DateTime(2001, 1, 1, 0, 0, 0).getMillis))))
+          asOfDate = new DateTime(2001, 1, 1, 0, 0, 0))))
     val datasets = portfolioDesign.eTFSelections.map {selection =>
       sortedCommonDatesDataset.filter(_.eTFCode == selection.eTFCode)}
     val actual = PortfolioSnapshot(portfolioDesign, datasets)
-    actual.copy(sameDateUniqueCodesETFDatas = actual.sameDateUniqueCodesETFDatas.map(data => data.copy(cash = 0d))) shouldEqual expected
+
+    actual.copy(
+      sameDateUniqueCodesETFDatas =
+        actual.sameDateUniqueCodesETFDatas.map(data => data.copy(cash = 0d))) shouldEqual expected
 
   }
 
+  "Creating a portfolio snapshot from the last date in a common dates dataset" should "succeed, taking a snapshot of the " +
+  "data for the last date" in {
+
+    val expected =
+      PortfolioSnapshot(
+        portfolioSnapshot.sameDateUniqueCodesETFDatas.map(_.copy(
+          quantity = 0d,
+          asOfDate = new DateTime(2001, 1, 1, 0, 0, 0).plusDays(maxDaysToAdd))))
+    val datasets = portfolioDesign.eTFSelections.map {selection =>
+      sortedCommonDatesDataset.filter(_.eTFCode == selection.eTFCode)}
+    val actual = PortfolioSnapshot(portfolioDesign, datasets, useLatestEntry = true)
+
+    actual.copy(
+      sameDateUniqueCodesETFDatas =
+        actual.sameDateUniqueCodesETFDatas.map(data => data.copy(cash = 0d))) shouldEqual expected
+
+  }
 }
