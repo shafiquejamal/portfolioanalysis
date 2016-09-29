@@ -2,14 +2,15 @@ package com.eigenroute.portfolioanalysis.investment
 
 import com.eigenroute.portfolioanalysis.{DatasetFixture, PortfolioFixture}
 import org.joda.time.DateTime
-import org.scalatest.{ShouldMatchers, FlatSpec}
+import org.scalatest.{FlatSpec, ShouldMatchers}
 
 class OverlappingDatesCalculatorUTest extends FlatSpec with ShouldMatchers with PortfolioFixture {
 
   import DatasetFixture._
   val oDC = new OverlappingDatesCalculator(portfolioDesign)
 
-  "The overlapping dates creator" should "return the dates that are common to all datasets in the collection" in {
+  "The overlapping dates creator" should "return the dates that are common to all datasets in the collection" in
+  new InvestmentFixture {
 
     val actual = oDC.overlappingDates(sortedCommonDatesDataset)
     val expected =

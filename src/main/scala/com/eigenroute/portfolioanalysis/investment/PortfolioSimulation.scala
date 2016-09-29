@@ -1,7 +1,6 @@
 package com.eigenroute.portfolioanalysis.investment
 
 import com.eigenroute.portfolioanalysis.rebalancing.{ETFDataPlus, PortfolioDesign}
-import org.apache.spark.sql.{Dataset, SparkSession}
 
 class PortfolioSimulation(
     investmentDurationInYears: Int,
@@ -13,7 +12,7 @@ class PortfolioSimulation(
     maxAllowedDeviation: BigDecimal,
     sortedCommonDatesETFData:Seq[ETFDataPlus]) {
 
-  def simulate(implicit sparkSession: SparkSession) = {
+  def simulate = {
     val investmentPeriods =
       new InvestmentPeriodsCreator(portfolioDesign, sortedCommonDatesETFData, investmentDurationInYears).create
 

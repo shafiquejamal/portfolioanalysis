@@ -66,7 +66,7 @@ class InvestmentATest extends FlatSpec with ShouldMatchers with PortfolioFixture
   }
 
   it should "rebalance correctly when the period is longer than one year and the max allowed deviation is greater than " +
-  "zero" in {
+  "zero" in new InvestmentFixture {
 
     val investmentPeriodThreeYears = InvestmentPeriod(startDate, startDate.plusYears(3))
     val investment =
