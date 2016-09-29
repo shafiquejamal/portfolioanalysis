@@ -31,7 +31,12 @@ class Investment(
 
     val finalRebalancedPortfolio = sortedDatasetsSplitByRebalancingPeriod
       .foldLeft[RebalancedPortfolio](
-        RebalancedPortfolio(Seq[ETFDataPlus]().toDS, Seq(), 0d, initialInvestment, PortfolioSnapshot(Seq())))
+        RebalancedPortfolio(
+          Seq[ETFDataPlus]().toDS,
+          Seq(),
+          0d,
+          initialInvestment,
+          PortfolioSnapshot(Seq()), initialInvestment, investmentPeriod))
         { case (rebalancedPortfolio, datasetForRebalancingPeriod) =>
 
       val datasetForRebalancingPeriodWithQuantitiesFromPrevious = datasetForRebalancingPeriod.map { eTFData =>
@@ -81,7 +86,9 @@ class Investment(
         finalQuantities,
         accumulatedExDiv,
         finalQuantitiesAndCash.cashRemaining,
-        endOfPeriodSnapshot
+        endOfPeriodSnapshot,
+        initialInvestment,
+        investmentPeriod
       )
     }
 
@@ -91,9 +98,15 @@ class Investment(
         bidAskCostFractionOfNav,
         perTransactionTradingCost,
         finalRebalancedPortfolio.accumulatedExDiv,
-        finalRebalancedPortfolio.accumulatedCash
-      )
+        finalRebalancedPortfolio.accumulatedCash)
 
-    finalRebalancedPortfolio.copy(liquidatedValue = liquidatedValue)
+    val totalReturnFraction: BigDecimal = liquidatedValue / initialInvestment
+    val averageAnnualReturnFraction: BigDecimal =
+      math.pow((totalReturnFraction - 1).toDouble, 1d/InvestmentPeriod.lengthInYears(investmentPeriod))
+
+    finalRebalancedPortfolio.copy(
+      liquidatedValue = liquidatedValue,
+      totalReturnFraction = totalReturnFraction,
+      averageAnnualReturnFraction = averageAnnualReturnFraction)
   }
 }

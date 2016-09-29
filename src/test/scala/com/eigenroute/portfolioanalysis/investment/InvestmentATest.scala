@@ -61,6 +61,8 @@ class InvestmentATest extends FlatSpec with ShouldMatchers with PortfolioFixture
       FinalPortfolioQuantityToHave(eTFD, 47)
     )
     round(rebalancedPortfolio.liquidatedValue, 11) shouldEqual round(23595.1787353910698231944860653281361, 11)
+    round(rebalancedPortfolio.totalReturnFraction, 11) shouldEqual round(2.35011740392, 11)
+    round(rebalancedPortfolio.averageAnnualReturnFraction, 11) shouldEqual round(1.35011740392, 11)
   }
 
   it should "rebalance correctly when the period is longer than one year and the max allowed deviation is greater than " +
@@ -85,6 +87,8 @@ class InvestmentATest extends FlatSpec with ShouldMatchers with PortfolioFixture
       FinalPortfolioQuantityToHave(eTFD, 57)
     )
     round(rebalancedPortfolio.liquidatedValue, 11) shouldEqual round(98415.96353740885026470882029767256200, 11)
+    round(rebalancedPortfolio.totalReturnFraction, 11) shouldEqual round(9.80238680651, 11)
+    round(rebalancedPortfolio.averageAnnualReturnFraction, 11) shouldEqual round(2.06474686956, 11)
   }
 
   private def roundCashValue(eTFData: ETFDataPlus) = eTFData.copy(cash = round(eTFData.cash))

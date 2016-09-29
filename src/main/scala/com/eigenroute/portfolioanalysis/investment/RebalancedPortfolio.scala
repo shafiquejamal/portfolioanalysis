@@ -1,6 +1,6 @@
 package com.eigenroute.portfolioanalysis.investment
 
-import com.eigenroute.portfolioanalysis.rebalancing.{PortfolioSnapshot, ETFDataPlus, FinalPortfolioQuantityToHave}
+import com.eigenroute.portfolioanalysis.rebalancing.{ETFDataPlus, FinalPortfolioQuantityToHave, PortfolioSnapshot}
 import org.apache.spark.sql.Dataset
 
 case class RebalancedPortfolio(
@@ -9,5 +9,9 @@ case class RebalancedPortfolio(
     accumulatedExDiv: BigDecimal,
     accumulatedCash: BigDecimal,
     endOfPeriodSnapshot: PortfolioSnapshot,
-    liquidatedValue: BigDecimal = 0)
+    initialInvestment: BigDecimal,
+    investmentPeriod: InvestmentPeriod,
+    liquidatedValue: BigDecimal = 0,
+    totalReturnFraction: BigDecimal = 0,
+    averageAnnualReturnFraction: BigDecimal = 0)
 
