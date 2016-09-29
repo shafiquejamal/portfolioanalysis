@@ -25,7 +25,7 @@ class Investment(
         eTFData.asOfDate.getTime < endOfPeriod.getMillis)
       }.toSeq
 
-  def run()(sparkSession: SparkSession): RebalancedPortfolio = {
+  def rebalancePortfolio(implicit sparkSession: SparkSession): RebalancedPortfolio = {
 
     import sparkSession.implicits._
 

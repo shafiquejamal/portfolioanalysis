@@ -48,7 +48,7 @@ class InvestmentATest extends FlatSpec with ShouldMatchers with PortfolioFixture
       new Investment(
         investmentPeriodOneYear, Quarterly, 10040, 10, 0.0011, portfolioDesign, 0, investmentInputDatasetQuarterly)
     val expectedRebalancedData = filterAndRound(expectedRebalancedPortfolioQuarterly, startDatePlus12months)
-    val rebalancedPortfolio = investment.run()(spark)
+    val rebalancedPortfolio = investment.rebalancePortfolio
     val actualRebalancedData = collectAndRound(rebalancedPortfolio.rebalancedDataset)
 
     actualRebalancedData should contain theSameElementsAs expectedRebalancedData
@@ -74,7 +74,7 @@ class InvestmentATest extends FlatSpec with ShouldMatchers with PortfolioFixture
         investmentPeriodThreeYears, SemiAnnually, 10040, 10, 0.0011, portfolioDesign, 0.05,
         investmentInputDatasetSemiAnnually)
     val expectedRebalancedData = filterAndRound(expectedRebalancedPortfolioSemiAnnually, startDatePlus36months)
-    val rebalancedPortfolio = investment.run()(spark)
+    val rebalancedPortfolio = investment.rebalancePortfolio
     val actualRebalancedData = collectAndRound(rebalancedPortfolio.rebalancedDataset)
 
     actualRebalancedData should contain theSameElementsAs expectedRebalancedData
