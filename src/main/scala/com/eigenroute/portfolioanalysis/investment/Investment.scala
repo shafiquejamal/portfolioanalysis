@@ -49,14 +49,15 @@ class Investment(
           )
       }.persist()
 
-      val commonDatesDatasetsBeforeRebalancing: Seq[Dataset[ETFDataPlus]] = portfolioDesign.eTFSelections.map { selection =>
-        datasetForRebalancingPeriodWithQuantitiesFromPrevious.filter(_.eTFCode == selection.eTFCode)
+      val sameDateUniqueCodesETFDatasBeforeRebalancing: Seq[ETFDataPlus] =
+        portfolioDesign.eTFSelections.flatMap { selection =>
+          datasetForRebalancingPeriodWithQuantitiesFromPrevious.collect().toSeq.find(_.eTFCode == selection.eTFCode)
       }
 
       val finalQuantitiesAndCash: FinalPortfolioQuantitiesToHave =
         new PortfolioRebalancer(
           portfolioDesign,
-          PortfolioSnapshot(portfolioDesign, commonDatesDatasetsBeforeRebalancing),
+          PortfolioSnapshot(sameDateUniqueCodesETFDatasBeforeRebalancing),
           bidAskCostFractionOfNav,
           maxAllowedDeviation,
           perTransactionTradingCost,
@@ -72,14 +73,14 @@ class Investment(
       }
       val accumulatedExDiv = datasetForRebalancingPeriod.map(_.exDividend.toDouble).collect().sum
 
-      lazy val commonDatesDatasetsAfterRebalancing: Seq[Dataset[ETFDataPlus]] =
-        portfolioDesign.eTFSelections.map { selection =>
-          updatedDatasetForRebalancingPeriod.filter(_.eTFCode == selection.eTFCode)
+      lazy val sameDateUniqueCodesETFDatasAfterRebalancing: Seq[ETFDataPlus] =
+        portfolioDesign.eTFSelections.flatMap { selection =>
+          updatedDatasetForRebalancingPeriod.collect().toSeq.reverse.find(_.eTFCode == selection.eTFCode)
       }
 
       val endOfPeriodSnapshot: PortfolioSnapshot =
         if (sortedDatasetsSplitByRebalancingPeriod.reverse.headOption.fold(false){_ == datasetForRebalancingPeriod})
-          PortfolioSnapshot(portfolioDesign, commonDatesDatasetsAfterRebalancing, useLatestEntry = true)
+          PortfolioSnapshot(sameDateUniqueCodesETFDatasAfterRebalancing)
         else
           PortfolioSnapshot(Seq())
 
@@ -104,7 +105,8 @@ class Investment(
 
     val totalReturnFraction: BigDecimal = (liquidatedValue / initialInvestment) - 1
     val averageAnnualReturnFraction: BigDecimal =
-      math.pow((liquidatedValue / initialInvestment).toDouble, 1d/InvestmentPeriod.lengthInYears(investmentPeriod)) - BigDecimal(1)
+      math.pow((liquidatedValue / initialInvestment).toDouble,
+               1d/InvestmentPeriod.lengthInYears(investmentPeriod)) - BigDecimal(1)
 
     finalRebalancedPortfolio.copy(
       liquidatedValue = liquidatedValue,
