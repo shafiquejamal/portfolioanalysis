@@ -11,7 +11,7 @@ class PortfolioSimulationATest extends FlatSpec with ShouldMatchers with Portfol
   "The portfolio simulator" should "simulate rebalanced portfolios for multiple investment periods" in {
 
     val simulationResults =
-      new PortfolioSimulation(2, SemiAnnually, 10040, 10, 0.0011, portfolioDesign, 0.05, investmentInputDatasetSemiAnnually)
+      new PortfolioSimulation(2, SemiAnnually, 10040, 10, 0.0011, portfolioDesign, 0.05, investmentInputDataSemiAnnually)
       .simulate
 
     simulationResults

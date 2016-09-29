@@ -11,11 +11,11 @@ class PortfolioSimulation(
     bidAskCostFractionOfNav: BigDecimal,
     portfolioDesign: PortfolioDesign,
     maxAllowedDeviation: BigDecimal,
-    sortedCommonDatesDataset:Dataset[ETFDataPlus]) {
+    sortedCommonDatesETFData:Seq[ETFDataPlus]) {
 
   def simulate(implicit sparkSession: SparkSession) = {
     val investmentPeriods =
-      new InvestmentPeriodsCreator(portfolioDesign, sortedCommonDatesDataset, investmentDurationInYears).create
+      new InvestmentPeriodsCreator(portfolioDesign, sortedCommonDatesETFData, investmentDurationInYears).create
 
     val temp = investmentPeriods.map { investmentPeriod =>
       val foo = new Investment(
@@ -26,7 +26,7 @@ class PortfolioSimulation(
           bidAskCostFractionOfNav,
           portfolioDesign,
           maxAllowedDeviation,
-          sortedCommonDatesDataset
+          sortedCommonDatesETFData
           ).rebalancePortfolio
       (foo.investmentPeriod, foo.averageAnnualReturnFraction, foo.endOfPeriodSnapshot)
     }

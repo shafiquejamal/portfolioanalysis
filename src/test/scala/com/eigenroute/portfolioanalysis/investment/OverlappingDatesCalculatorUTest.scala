@@ -13,7 +13,7 @@ class OverlappingDatesCalculatorUTest extends FlatSpec with ShouldMatchers with 
 
     val actual = oDC.overlappingDates(sortedCommonDatesDataset)
     val expected =
-      commonDatesETFData.filter(_.eTFCode == eTFA).map(eTFData => new DateTime(eTFData.asOfDate.getTime))
+      sortedCommonDatesETFData.filter(_.eTFCode == eTFA).map(eTFData => new DateTime(eTFData.asOfDate.getTime))
     actual should contain theSameElementsInOrderAs expected
 
     val datasets =

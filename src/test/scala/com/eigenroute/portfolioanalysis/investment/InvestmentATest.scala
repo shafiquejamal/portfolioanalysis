@@ -15,41 +15,41 @@ class InvestmentATest extends FlatSpec with ShouldMatchers with PortfolioFixture
   "The number of rebalancing opportunities" should "be calculated as investment period in months divided by rebalancing " +
   "period on months" in new InvestmentFixture {
     val investmentMonthlyRebalancing =
-      new Investment(investmentPeriod, Monthly, 10040, 10, 0.0011, portfolioDesign, 0.05, sortedCommonDatesDataset)
+      new Investment(investmentPeriod, Monthly, 10040, 10, 0.0011, portfolioDesign, 0.05, sortedCommonDatesETFData)
 
     val investmentQuarterlyRebalancing =
-      new Investment(investmentPeriod, Quarterly, 10040, 10, 0.0011, portfolioDesign, 0.05, sortedCommonDatesDataset)
+      new Investment(investmentPeriod, Quarterly, 10040, 10, 0.0011, portfolioDesign, 0.05, sortedCommonDatesETFData)
 
     val investmentSemiAnnuallyRebalancing =
-      new Investment(investmentPeriod, SemiAnnually, 10040, 10, 0.0011, portfolioDesign, 0.05, sortedCommonDatesDataset)
+      new Investment(investmentPeriod, SemiAnnually, 10040, 10, 0.0011, portfolioDesign, 0.05, sortedCommonDatesETFData)
 
     val investmentAnnualRebalancing =
-      new Investment(investmentPeriod, Annually, 10040, 10, 0.0011, portfolioDesign, 0.05, sortedCommonDatesDataset)
+      new Investment(investmentPeriod, Annually, 10040, 10, 0.0011, portfolioDesign, 0.05, sortedCommonDatesETFData)
 
     investmentMonthlyRebalancing.totalNumberOfRebalancingIntervals shouldEqual 36
-    val datasetSplitIntoRebalancingIntervals =
-      investmentMonthlyRebalancing.sortedDatasetsSplitByRebalancingPeriod.map(_.collect().toList)
-    datasetSplitIntoRebalancingIntervals.length shouldEqual 36
-    datasetSplitIntoRebalancingIntervals.foreach { ds => ds should not be empty }
+    val eTFDataSplitIntoRebalancingIntervals =
+      investmentMonthlyRebalancing.sortedETFDataSplitByRebalancingPeriod
+    eTFDataSplitIntoRebalancingIntervals.length shouldEqual 36
+    eTFDataSplitIntoRebalancingIntervals.foreach { ds => ds should not be empty }
 
     investmentQuarterlyRebalancing.totalNumberOfRebalancingIntervals shouldEqual 12
-    investmentQuarterlyRebalancing.sortedDatasetsSplitByRebalancingPeriod.length shouldEqual 12
+    investmentQuarterlyRebalancing.sortedETFDataSplitByRebalancingPeriod.length shouldEqual 12
 
     investmentSemiAnnuallyRebalancing.totalNumberOfRebalancingIntervals shouldEqual 6
-    investmentSemiAnnuallyRebalancing.sortedDatasetsSplitByRebalancingPeriod.length shouldEqual 6
+    investmentSemiAnnuallyRebalancing.sortedETFDataSplitByRebalancingPeriod.length shouldEqual 6
 
     investmentAnnualRebalancing.totalNumberOfRebalancingIntervals shouldEqual 3
-    investmentAnnualRebalancing.sortedDatasetsSplitByRebalancingPeriod.length shouldEqual 3
+    investmentAnnualRebalancing.sortedETFDataSplitByRebalancingPeriod.length shouldEqual 3
   }
 
   "The simulation" should "create a dataset with the correct quantities" in new InvestmentFixture {
     val investmentPeriodOneYear = InvestmentPeriod(startDate, startDate.plusYears(1))
     val investment =
       new Investment(
-        investmentPeriodOneYear, Quarterly, 10040, 10, 0.0011, portfolioDesign, 0, investmentInputDatasetQuarterly)
+        investmentPeriodOneYear, Quarterly, 10040, 10, 0.0011, portfolioDesign, 0, investmentInputDataQuarterly)
     val expectedRebalancedData = filterAndRound(expectedRebalancedPortfolioQuarterly, startDatePlus12months)
     val rebalancedPortfolio = investment.rebalancePortfolio
-    val actualRebalancedData = collectAndRound(rebalancedPortfolio.rebalancedDataset)
+    val actualRebalancedData = collectAndRound(rebalancedPortfolio.rebalancedETFData)
 
     actualRebalancedData should contain theSameElementsAs expectedRebalancedData
     rebalancedPortfolio.accumulatedExDiv shouldEqual 20
@@ -71,11 +71,10 @@ class InvestmentATest extends FlatSpec with ShouldMatchers with PortfolioFixture
     val investmentPeriodThreeYears = InvestmentPeriod(startDate, startDate.plusYears(3))
     val investment =
       new Investment(
-        investmentPeriodThreeYears, SemiAnnually, 10040, 10, 0.0011, portfolioDesign, 0.05,
-        investmentInputDatasetSemiAnnually)
+        investmentPeriodThreeYears, SemiAnnually, 10040, 10, 0.0011, portfolioDesign, 0.05, investmentInputDataSemiAnnually)
     val expectedRebalancedData = filterAndRound(expectedRebalancedPortfolioSemiAnnually, startDatePlus36months)
     val rebalancedPortfolio = investment.rebalancePortfolio
-    val actualRebalancedData = collectAndRound(rebalancedPortfolio.rebalancedDataset)
+    val actualRebalancedData = collectAndRound(rebalancedPortfolio.rebalancedETFData)
 
     actualRebalancedData should contain theSameElementsAs expectedRebalancedData
     rebalancedPortfolio.accumulatedExDiv shouldEqual 1.75
@@ -93,7 +92,7 @@ class InvestmentATest extends FlatSpec with ShouldMatchers with PortfolioFixture
 
   private def roundCashValue(eTFData: ETFDataPlus) = eTFData.copy(cash = round(eTFData.cash))
 
-  private def collectAndRound(dataset: Dataset[ETFDataPlus]) = dataset.collect().toList.map(roundCashValue)
+  private def collectAndRound(dataset: Seq[ETFDataPlus]) = dataset.map(roundCashValue)
 
   private def filterAndRound(dataset: Dataset[ETFDataPlus], endDate :DateTime) =
     dataset.collect().toList.filter { eTFData => eTFData.asOfDate.isBefore(endDate)}.map(roundCashValue)

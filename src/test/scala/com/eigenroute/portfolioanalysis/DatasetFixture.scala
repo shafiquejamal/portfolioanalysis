@@ -26,24 +26,24 @@ object DatasetFixture extends PortfolioFixture {
 
   val eTFPrices: Map[ETFCode, Double] = Map(eTFA -> 20, eTFB -> 30, eTFC -> 40, eTFD -> 50)
 
-  val commonDatesETFData = portfolioDesign.eTFSelections.flatMap { selection =>
+  val sortedCommonDatesETFData = portfolioDesign.eTFSelections.flatMap { selection =>
       0.to(maxDaysToAdd).map { daysToAdd =>
         ETFDataPlus(
-          new DateTime(commonStartDate.plusDays(daysToAdd)),
+          commonStartDate.plusDays(daysToAdd),
           selection.eTFCode,
           "1",
           eTFPrices(selection.eTFCode), 0d, 0d, 0)
       }.toSeq
     }
 
-  val sortedCommonDatesDataset = commonDatesETFData.toDS().persist()
+  val sortedCommonDatesDataset = sortedCommonDatesETFData.toDS().persist()
 
-  val sortedCommonDatesLessDatesToOmitPlusNonCommon = (commonDatesETFData ++ Seq(
+  val sortedCommonDatesLessDatesToOmitPlusNonCommon = (sortedCommonDatesETFData ++ Seq(
       ETFDataPlus(new DateTime(commonStartDate.minusDays(1)), eTFA, "1", 20d, 0d, 0d, 0),
       ETFDataPlus(new DateTime(commonStartDate.minusDays(2)), eTFB, "1", 30d, 0d, 0d, 0),
       ETFDataPlus(new DateTime(commonStartDate.minusDays(3)), eTFC, "1", 40d, 0d, 0d, 0),
       ETFDataPlus(new DateTime(commonStartDate.minusDays(4)), eTFD, "1", 50d, 0d, 0d, 0)
-    ) ++ Seq(
+                                                                                      ) ++ Seq(
       ETFDataPlus(new DateTime(commonStartDate.plusDays(maxDaysToAdd + 1)), eTFA, "1", 0d, 0d, 0d, 0),
       ETFDataPlus(new DateTime(commonStartDate.plusDays(maxDaysToAdd + 2)), eTFB, "1", 0d, 0d, 0d, 0),
       ETFDataPlus(new DateTime(commonStartDate.plusDays(maxDaysToAdd + 3)), eTFC, "1", 0d, 0d, 0d, 0),
@@ -51,7 +51,7 @@ object DatasetFixture extends PortfolioFixture {
     )).filterNot{ eTFData => datesToOmit.contains(new DateTime(eTFData.asOfDate.getTime))}.sortBy(_.asOfDate.getTime)
                                                       .toDS().persist()
 
-  val iPC = new InvestmentPeriodsCreator(portfolioDesign, sortedCommonDatesDataset, 10)
+  val iPC = new InvestmentPeriodsCreator(portfolioDesign, sortedCommonDatesETFData, 10)
 
   val startDate = new InvestmentFixture {}.startDate
   val startDatePlus1Day = startDate.plusDays(1)
