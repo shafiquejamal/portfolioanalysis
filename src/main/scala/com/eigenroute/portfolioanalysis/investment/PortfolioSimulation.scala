@@ -12,12 +12,12 @@ class PortfolioSimulation(
     maxAllowedDeviation: BigDecimal,
     sortedCommonDatesETFData:Seq[ETFDataPlus]) {
 
-  def simulate = {
+  def simulate: Seq[PortfolioPerformance] = {
     val investmentPeriods =
       new InvestmentPeriodsCreator(portfolioDesign, sortedCommonDatesETFData, investmentDurationInYears).create
 
-    val temp = investmentPeriods.map { investmentPeriod =>
-      val foo = new Investment(
+    investmentPeriods.map { investmentPeriod =>
+      new Investment(
           investmentPeriod,
           rebalancingInterval,
           initialInvestment,
@@ -25,11 +25,7 @@ class PortfolioSimulation(
           bidAskCostFractionOfNav,
           portfolioDesign,
           maxAllowedDeviation,
-          sortedCommonDatesETFData
-          ).rebalancePortfolio
-      (foo.investmentPeriod, foo.averageAnnualReturnFraction, foo.endOfPeriodSnapshot)
+          sortedCommonDatesETFData).rebalancePortfolio.portfolioPerformance
     }
-
-    temp
   }
 }

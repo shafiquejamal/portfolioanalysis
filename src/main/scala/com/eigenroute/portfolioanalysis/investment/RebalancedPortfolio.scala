@@ -9,8 +9,7 @@ case class RebalancedPortfolio(
     accumulatedCash: BigDecimal,
     endOfPeriodSnapshot: PortfolioSnapshot,
     initialInvestment: BigDecimal,
-    investmentPeriod: InvestmentPeriod,
+    portfolioPerformance: PortfolioPerformance,
     liquidatedValue: BigDecimal = 0,
-    totalReturnFraction: BigDecimal = 0,
-    averageAnnualReturnFraction: BigDecimal = 0)
+    totalReturnFraction: BigDecimal = 0)
 

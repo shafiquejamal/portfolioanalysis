@@ -33,7 +33,7 @@ class Investment(
           Seq(),
           0d,
           initialInvestment,
-          PortfolioSnapshot(Seq()), initialInvestment, investmentPeriod))
+          PortfolioSnapshot(Seq()), initialInvestment, PortfolioPerformance(investmentPeriod, BigDecimal(0))))
         { case (rebalancedPortfolio, eTFDataForRebalancingPeriod) =>
 
       val eTFDataForRebalancingPeriodWithQuantitiesFromPrevious: Seq[ETFDataPlus] =
@@ -88,7 +88,7 @@ class Investment(
         finalQuantitiesAndCash.cashRemaining,
         endOfPeriodSnapshot,
         initialInvestment,
-        investmentPeriod
+        PortfolioPerformance(investmentPeriod, 0d)
       )
     }
 
@@ -108,6 +108,7 @@ class Investment(
     finalRebalancedPortfolio.copy(
       liquidatedValue = liquidatedValue,
       totalReturnFraction = totalReturnFraction,
-      averageAnnualReturnFraction = averageAnnualReturnFraction)
+      portfolioPerformance = PortfolioPerformance(investmentPeriod, averageAnnualReturnFraction)
+    )
   }
 }
