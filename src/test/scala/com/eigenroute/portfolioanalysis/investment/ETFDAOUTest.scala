@@ -33,9 +33,8 @@ class ETFDAOUTest
 
   "Querrying by ETF codes" should "return the data for the given ETF codes" in {
 
-    val expected = Seq(eTFDataAAA1, eTFDataAAA2, eTFDataCCC1, eTFDataCCC2)
     val eTFData = eTFDAO.by(Seq(ETFCode("AAA"), ETFCode("CCC")))
-    eTFData should contain theSameElementsAs expected
+    eTFData should contain theSameElementsAs expectedFetchResult
   }
 
 }

@@ -25,6 +25,8 @@ trait ETFDataFixture {
   val eTFDataBBB2 = ETFDataPlus(dateLater, ETFCode("BBB"), "1", 121, 36, 0, 0)
   val eTFDataCCC1 = ETFDataPlus(date1, ETFCode("CCC"), "1", 130, 45, 0, 0)
   val eTFDataCCC2 = ETFDataPlus(dateLater, ETFCode("CCC"), "1", 131, 46, 0, 0)
+  val eTFDataDDD1 = ETFDataPlus(date1, ETFCode("DDD"), "1", 130, 45, 0, 0)
+  val eTFDataDDD2 = ETFDataPlus(dateLater, ETFCode("DDD"), "1", 131, 46, 0, 0)
 
   val eTFDataToAdd = Seq(
     sql"""INSERT INTO historical (id, code, brand, xnumber, indexreturn, nav, asofdate, exdividend, createdat) values
@@ -43,7 +45,8 @@ trait ETFDataFixture {
          (${id5}, 'CCC', 'iSharesblahblahblah', '1', 1, 130, ${date1}, 45, ${now})
        """,
     sql"""INSERT INTO historical (id, code, brand, xnumber, indexreturn, nav, asofdate, exdividend, createdat) values
-         (${id6}, 'CCC', 'iSharesblahblahblah', '1', 1, 131, ${dateLater}, 46, ${now})
-       """
+         (${id6}, 'CCC', 'iSharesblahblahblah', '1', 1, 131, ${dateLater}, 46, ${now})"""
   )
+
+  val expectedFetchResult = Seq(eTFDataAAA1, eTFDataAAA2, eTFDataCCC1, eTFDataCCC2)
 }
