@@ -10,7 +10,8 @@ class InvestmentPeriodsCreator(
   investmentDurationYears: Int) {
 
   val allDates: List[DateTime] =
-    sortedCommonDatesETFData.toList.map(eTFData => javaSQLDateToDateTime(eTFData.asOfDate)).distinct
+    sortedCommonDatesETFData.toList.map(eTFData => javaSQLDateToDateTime(eTFData.asOfDate))
+    .distinct.sortWith( (d1, d2) => d1.isBefore(d2))
   val maybeEarliestDate: Option[DateTime] = allDates.headOption
   val maybeLatestDate: Option[DateTime] = allDates.reverse.headOption
 
@@ -19,14 +20,17 @@ class InvestmentPeriodsCreator(
       earliestDate <- maybeEarliestDate.toSeq
       latestDate <- maybeLatestDate.toSeq
       daysBetween =
-        Days.daysBetween(earliestDate.toLocalDate, latestDate.minusYears(investmentDurationYears)
-        .plusDays(1).toLocalDate).getDays
+        Days.daysBetween(
+          earliestDate.toLocalDate,
+          latestDate.minusYears(investmentDurationYears).plusDays(1).toLocalDate)
+          .getDays
       day <- 0.to(daysBetween)
       if !earliestDate.plusYears(investmentDurationYears).isAfter(latestDate)
       startOfPeriod = earliestDate.plusDays(day)
       endOfPeriod = earliestDate.plusYears(investmentDurationYears).plusDays(day)
     } yield {
       InvestmentPeriod(startOfPeriod, endOfPeriod)
-    }).filter( iP => allDates.contains(iP.startDate))
-
+    }).filter(iP =>
+      allDates.contains(iP.startDate)
+    )
 }

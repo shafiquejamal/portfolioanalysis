@@ -2,31 +2,22 @@ package com.eigenroute.portfolioanalysis
 
 import com.eigenroute.portfolioanalysis.rebalancing.{ETFDataPlus, FinalPortfolioQuantityToHave}
 import com.eigenroute.portfolioanalysis.util.RichJoda._
+import org.apache.spark.SparkConf
 import org.apache.spark.sql.{Dataset, SparkSession}
-import org.joda.time.DateTime
 
 object DatasetFixture extends PortfolioFixture {
 
-  implicit val spark = SparkSession.builder().appName("financial_data").master("local").getOrCreate()
-  import spark.implicits._
+  val testConf =
+    new SparkConf()
+    .setAppName("Simple Application").setMaster("local")
+    .set("spark.rpc.netty.dispatcher.numThreads","2")
+    .set("spark.driver.allowMultipleContexts", "true")
+  implicit val testSparkSession =
+    SparkSession.builder().appName("financial_data").master("local").config(testConf).getOrCreate()
+  import testSparkSession.implicits._
 
   val investmentFixture = new InvestmentFixture {}
   import investmentFixture._
-
-  val sortedCommonDatesDataset = sortedCommonDatesETFData.toDS().persist()
-
-  val sortedCommonDatesLessDatesToOmitPlusNonCommon = (sortedCommonDatesETFData ++ Seq(
-      ETFDataPlus(new DateTime(commonStartDate.minusDays(1)), eTFA, "1", 20d, 0d, 0d, 0),
-      ETFDataPlus(new DateTime(commonStartDate.minusDays(2)), eTFB, "1", 30d, 0d, 0d, 0),
-      ETFDataPlus(new DateTime(commonStartDate.minusDays(3)), eTFC, "1", 40d, 0d, 0d, 0),
-      ETFDataPlus(new DateTime(commonStartDate.minusDays(4)), eTFD, "1", 50d, 0d, 0d, 0)
-                                                                                      ) ++ Seq(
-      ETFDataPlus(new DateTime(commonStartDate.plusDays(maxDaysToAdd + 1)), eTFA, "1", 0d, 0d, 0d, 0),
-      ETFDataPlus(new DateTime(commonStartDate.plusDays(maxDaysToAdd + 2)), eTFB, "1", 0d, 0d, 0d, 0),
-      ETFDataPlus(new DateTime(commonStartDate.plusDays(maxDaysToAdd + 3)), eTFC, "1", 0d, 0d, 0d, 0),
-      ETFDataPlus(new DateTime(commonStartDate.plusDays(maxDaysToAdd + 4)), eTFD, "1", 0d, 0d, 0d, 0)
-    )).filterNot{ eTFData => datesToOmit.contains(new DateTime(eTFData.asOfDate.getTime))}.sortBy(_.asOfDate.getTime)
-  .toDS().persist()
 
   val investmentInputDatasetQuarterly: Dataset[ETFDataPlus] = investmentInputDataQuarterly.toDS
 
@@ -60,22 +51,26 @@ object DatasetFixture extends PortfolioFixture {
   val expectedRebalancedPortfolioQuarterly: Dataset[ETFDataPlus] = investmentInputDatasetQuarterly.map { eTFData =>
     if (eTFData.asOfDate isBefore startDatePlus3months)
       eTFData.copy(
-        quantity = BigDecimal(expectedQuantitiesQuarterly(1).find(_.eTFCode == eTFData.eTFCode).map(_.quantity).getOrElse(0)),
+        quantity =
+          BigDecimal(expectedQuantitiesQuarterly(1).find(_.eTFCode == eTFData.eTFCode).map(_.quantity).getOrElse(0)),
         cash = 9.0220
       )
     else if (eTFData.asOfDate isBefore startDatePlus6months)
       eTFData.copy(
-        quantity = BigDecimal(expectedQuantitiesQuarterly(2).find(_.eTFCode == eTFData.eTFCode).map(_.quantity).getOrElse(0)),
+        quantity =
+          BigDecimal(expectedQuantitiesQuarterly(2).find(_.eTFCode == eTFData.eTFCode).map(_.quantity).getOrElse(0)),
         cash = 1.5259217860353611027869343721905
       )
     else if (eTFData.asOfDate isBefore startDatePlus9months)
       eTFData.copy(
-        quantity = BigDecimal(expectedQuantitiesQuarterly(3).find(_.eTFCode == eTFData.eTFCode).map(_.quantity).getOrElse(0)),
+        quantity =
+          BigDecimal(expectedQuantitiesQuarterly(3).find(_.eTFCode == eTFData.eTFCode).map(_.quantity).getOrElse(0)),
         cash = 4.5557653581060833083608031165721
       )
     else
       eTFData.copy(
-        quantity = BigDecimal(expectedQuantitiesQuarterly(4).find(_.eTFCode == eTFData.eTFCode).map(_.quantity).getOrElse(0)),
+        quantity =
+          BigDecimal(expectedQuantitiesQuarterly(4).find(_.eTFCode == eTFData.eTFCode).map(_.quantity).getOrElse(0)),
         cash = 1.1541624213365298172010788133061
       )
   }

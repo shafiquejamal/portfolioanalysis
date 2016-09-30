@@ -20,7 +20,8 @@ class PortfolioSimulationATest extends FlatSpec with ShouldMatchers with Portfol
         2.955323253380445,
         -0.5347424130020722,
         2.564018737053584,
-        1.575562015542863
+        1.575562015542863,
+        -0.81560188019771876
       )
 
     val simulationResults =

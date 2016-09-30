@@ -232,6 +232,18 @@ trait PortfolioFixture {
       }.toSeq
     }
 
+    val sortedCommonDatesLessDatesToOmitPlusNonCommon = (sortedCommonDatesETFData ++ Seq(
+      ETFDataPlus(new DateTime(commonStartDate.minusDays(1)), eTFA, "1", 20d, 0d, 0d, 0),
+      ETFDataPlus(new DateTime(commonStartDate.minusDays(2)), eTFB, "1", 30d, 0d, 0d, 0),
+      ETFDataPlus(new DateTime(commonStartDate.minusDays(3)), eTFC, "1", 40d, 0d, 0d, 0),
+      ETFDataPlus(new DateTime(commonStartDate.minusDays(4)), eTFD, "1", 50d, 0d, 0d, 0)
+    ) ++ Seq(
+      ETFDataPlus(new DateTime(commonStartDate.plusDays(maxDaysToAdd + 1)), eTFA, "1", 0d, 0d, 0d, 0),
+      ETFDataPlus(new DateTime(commonStartDate.plusDays(maxDaysToAdd + 2)), eTFB, "1", 0d, 0d, 0d, 0),
+      ETFDataPlus(new DateTime(commonStartDate.plusDays(maxDaysToAdd + 3)), eTFC, "1", 0d, 0d, 0d, 0),
+      ETFDataPlus(new DateTime(commonStartDate.plusDays(maxDaysToAdd + 4)), eTFD, "1", 0d, 0d, 0d, 0)
+    )).filterNot{ eTFData => datesToOmit.contains(new DateTime(eTFData.asOfDate.getTime))}.sortBy(_.asOfDate.getTime)
+
     val startDatePlus1Day = startDate.plusDays(1)
     val startDatePlus3months = startDate.plusMonths(3)
     val startDatePlus6months = startDate.plusMonths(6)
