@@ -1,7 +1,6 @@
 package com.eigenroute.portfolioanalysis.investment
 
 import com.eigenroute.portfolioanalysis.rebalancing.{ETFDataPlus, PortfolioDesign}
-import com.eigenroute.portfolioanalysis.util.RichJoda._
 import org.joda.time.{DateTime, Days}
 
 class InvestmentPeriodsCreator(
@@ -10,7 +9,7 @@ class InvestmentPeriodsCreator(
   investmentDurationYears: Int) {
 
   val allDates: List[DateTime] =
-    sortedCommonDatesETFData.toList.map(eTFData => javaSQLDateToDateTime(eTFData.asOfDate))
+    sortedCommonDatesETFData.toList.map(_.asOfDate)
     .distinct.sortWith( (d1, d2) => d1.isBefore(d2))
   val maybeEarliestDate: Option[DateTime] = allDates.headOption
   val maybeLatestDate: Option[DateTime] = allDates.reverse.headOption

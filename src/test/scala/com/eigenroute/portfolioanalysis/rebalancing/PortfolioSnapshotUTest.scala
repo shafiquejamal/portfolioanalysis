@@ -1,7 +1,5 @@
 package com.eigenroute.portfolioanalysis.rebalancing
 
-import java.sql.Date
-
 import com.eigenroute.portfolioanalysis.PortfolioFixture
 import org.joda.time.DateTime
 import org.scalatest.TryValues._
@@ -18,7 +16,7 @@ class PortfolioSnapshotUTest extends FlatSpec with ShouldMatchers with Portfolio
         eTFDataPlusB,
         eTFDataPlusC,
         eTFDataPlusD,
-        ETFDataPlus(new Date(new DateTime(2016, 1, 2, 1, 1, 1).getMillis), eTFA, "", 20, 0, 50, 0d)
+        ETFDataPlus(new DateTime(2016, 1, 2, 1, 1, 1), eTFA, "", 20, 0, 50, 0d)
       )
 
     Try(PortfolioSnapshot(invalidData)).failure.exception shouldBe a[RuntimeException]

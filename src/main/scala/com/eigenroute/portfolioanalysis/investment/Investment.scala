@@ -20,8 +20,8 @@ class Investment(
       val startOfPeriod = investmentPeriod.startDate.plusMonths(monthsToAddToStartOfPeriod)
       val endOfPeriod = startOfPeriod.plusMonths(rebalancingInterval)
       commonDatesETFData.filter(eTFData =>
-        eTFData.asOfDate.getTime >= startOfPeriod.getMillis &
-        eTFData.asOfDate.getTime < endOfPeriod.getMillis)
+        !eTFData.asOfDate.isBefore(startOfPeriod) &
+        eTFData.asOfDate.isBefore(endOfPeriod))
       }.toSeq
 
   def rebalancePortfolio: RebalancedPortfolio = {

@@ -2,20 +2,18 @@ package com.eigenroute.portfolioanalysis.investment
 
 import com.eigenroute.portfolioanalysis.PortfolioFixture
 import com.eigenroute.portfolioanalysis.rebalancing.ETFDataPlus
-import org.joda.time.DateTime
 import org.scalatest.{FlatSpec, ShouldMatchers}
-import com.eigenroute.portfolioanalysis.util.RichJoda._
 
 class OverlappingDatesCalculatorUTest extends FlatSpec with ShouldMatchers with PortfolioFixture {
 
   val oDC = new OverlappingDatesCalculator(portfolioDesign)
 
-  "The overlapping dates creator" should "return the dates that are common to all datasets in the collection" in
+  "The overlapping dates creator" should "return the dates that are common to all eTFData in the collection" in
   new InvestmentFixture {
 
     val actual = oDC.overlappingDates(sortedCommonDatesLessDatesToOmitPlusNonCommon)
     val expected =
-      sortedCommonDatesETFData.filter(_.eTFCode == eTFA).map(eTFData => new DateTime(eTFData.asOfDate.getTime))
+      sortedCommonDatesETFData.filter(_.eTFCode == eTFA).map(_.asOfDate)
       .filterNot{ datesToOmit.contains }
 
     actual should contain theSameElementsAs expected
@@ -30,7 +28,7 @@ class OverlappingDatesCalculatorUTest extends FlatSpec with ShouldMatchers with 
 
   }
 
-  it should "return a dataset of ETFs that contain only entries with dates that are common to all ETFs" in
+  it should "return a collection of ETFData of ETFs that contain only entries with dates that are common to all ETFs" in
   new InvestmentFixture {
     val nonOverlappingDatesETFData: Seq[ETFDataPlus] = Seq(
       ETFDataPlus(startDate.minusDays(10), eTFC, "1", 20, 0, 0, 0),

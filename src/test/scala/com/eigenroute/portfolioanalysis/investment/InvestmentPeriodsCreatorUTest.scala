@@ -1,7 +1,6 @@
 package com.eigenroute.portfolioanalysis.investment
 
 import com.eigenroute.portfolioanalysis.PortfolioFixture
-import com.eigenroute.portfolioanalysis.util.RichJoda._
 import org.joda.time.DateTime
 import org.scalatest.{FlatSpec, ShouldMatchers}
 

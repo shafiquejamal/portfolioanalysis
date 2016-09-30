@@ -1,6 +1,7 @@
 package com.eigenroute.portfolioanalysis.rebalancing
 
-import java.sql.{Timestamp, Date}
+import org.joda.time.DateTime
+import scalikejdbc.WrappedResultSet
 
 case class ETFCode(code: String) {
   require(code.length == 3)
@@ -10,10 +11,8 @@ case class ETFSelection(eTFCode: ETFCode, desiredWeight: BigDecimal) {
   require(desiredWeight >= 0 & desiredWeight <= 1)
 }
 
-case class ETFDataRaw(asOfDate: Timestamp, code: String, xnumber: String, nAV: Double, exDividend: Double)
-
 case class ETFDataPlus(
-    asOfDate: Date,
+    asOfDate: DateTime,
     eTFCode: ETFCode,
     xnumber: String,
     nAV: BigDecimal,
@@ -27,4 +26,7 @@ object ETFDataPlus {
       -1*x.asOfDate.compareTo(y.asOfDate)
     }
   }
+
+  def converter(rs:WrappedResultSet): ETFDataPlus = ETFDataPlus(
+    rs.jodaDateTime("asofdate"), ETFCode(rs.string("code")), rs.string("xnumber"), rs.double("nav"), rs.bigDecimal("exdividend"), 0, 0)
 }

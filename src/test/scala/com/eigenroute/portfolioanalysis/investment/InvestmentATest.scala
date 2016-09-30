@@ -3,14 +3,10 @@ package com.eigenroute.portfolioanalysis.investment
 import com.eigenroute.portfolioanalysis.PortfolioFixture
 import com.eigenroute.portfolioanalysis.investment.RebalancingInterval.{Annually, Monthly, Quarterly, SemiAnnually}
 import com.eigenroute.portfolioanalysis.rebalancing.{ETFDataPlus, FinalPortfolioQuantityToHave}
-import com.eigenroute.portfolioanalysis.util.RichJoda._
-import org.apache.spark.sql.Dataset
 import org.joda.time.DateTime
 import org.scalatest.{FlatSpec, ShouldMatchers}
 
 class InvestmentATest extends FlatSpec with ShouldMatchers with PortfolioFixture {
-
-  import com.eigenroute.portfolioanalysis.DatasetFixture._
 
   "The number of rebalancing opportunities" should "be calculated as investment period in months divided by rebalancing " +
   "period on months" in new InvestmentFixture {
@@ -42,7 +38,7 @@ class InvestmentATest extends FlatSpec with ShouldMatchers with PortfolioFixture
     investmentAnnualRebalancing.sortedETFDataSplitByRebalancingPeriod.length shouldEqual 3
   }
 
-  "The simulation" should "create a dataset with the correct quantities" in new InvestmentFixture {
+  "The simulation" should "create a collection of eTFData with the correct quantities" in new InvestmentFixture {
     val investmentPeriodOneYear = InvestmentPeriod(startDate, startDate.plusYears(1))
     val investment =
       new Investment(
@@ -92,8 +88,8 @@ class InvestmentATest extends FlatSpec with ShouldMatchers with PortfolioFixture
 
   private def roundCashValue(eTFData: ETFDataPlus) = eTFData.copy(cash = round(eTFData.cash))
 
-  private def collectAndRound(dataset: Seq[ETFDataPlus]) = dataset.map(roundCashValue)
+  private def collectAndRound(eTFData: Seq[ETFDataPlus]) = eTFData.map(roundCashValue)
 
-  private def filterAndRound(dataset: Dataset[ETFDataPlus], endDate :DateTime) =
-    dataset.collect().toList.filter { eTFData => eTFData.asOfDate.isBefore(endDate)}.map(roundCashValue)
+  private def filterAndRound(eTFData: Seq[ETFDataPlus], endDate :DateTime) =
+    eTFData.filter { eTFData => eTFData.asOfDate.isBefore(endDate)}.map(roundCashValue)
 }
