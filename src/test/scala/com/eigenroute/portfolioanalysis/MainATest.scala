@@ -4,9 +4,9 @@ import org.scalatest.{FlatSpec, ShouldMatchers}
 
 import scala.util.{Success, Try}
 
-class MainATest extends FlatSpec with ShouldMatchers {
+class MainATest extends FlatSpec with ShouldMatchers with PortfolioFixture {
 
-  "The application" should "run the simulation based on the input parameters" in {
+  "The application" should "run the simulation based on the input parameters" in new PortfolioFiles {
 
     val args: Array[String] = Array(
       "5",
@@ -15,7 +15,7 @@ class MainATest extends FlatSpec with ShouldMatchers {
       "9.99",
       "0.0011",
       "0.05",
-      "src/test/scala/com/eigenroute/portfolioanalysis/portfolioDesign.csv"
+      portfolioDesignPath.getAbsolutePath
     )
 
     Try(Main.main(args)) shouldBe a[Success[_]]

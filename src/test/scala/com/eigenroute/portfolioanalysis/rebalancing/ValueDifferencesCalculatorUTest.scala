@@ -16,7 +16,7 @@ class ValueDifferencesCalculatorUTest extends FlatSpec with ShouldMatchers with 
 
     (mockCalculator.newDesiredValues _)
     .expects(portfolioDesign, portfolioSnapshot, BigDecimal(.05), BigDecimal(10), BigDecimal(0), BigDecimal(0))
-    .returning(expectedDesiredValuesOneToBeTraded)
+    .returning(expectedDesiredValuesOneNotTraded)
     valueDifferencesCalculator.valueDifferences(portfolioDesign, portfolioSnapshot, 0.05, 10d, 0d, 0d).map { vDiff =>
       PortfolioValueDifference(vDiff.eTFCode, round(vDiff.valueDifference))
     } should contain theSameElementsAs expectedValueDifferenceOneNotTraded
@@ -44,7 +44,22 @@ class ValueDifferencesCalculatorUTest extends FlatSpec with ShouldMatchers with 
     .valueDifferences(portfolioDesign, portfolioSnapshotZeroQuantity, 0d, 10d, 0d, 10040d).map { vDiff =>
       PortfolioValueDifference(vDiff.eTFCode, round(vDiff.valueDifference))
     } should contain theSameElementsAs expectedValueDifferenceFirstTrades
+  }
 
+  it should "be able to handle the case where the portfolio snapshot does not contain one ETF matching that in the " +
+  "desired values" in new DesiredValueFixture with Fixture {
+
+    (mockCalculator.newDesiredValues _)
+    .expects(portfolioDesign, portfolioSnapshotMissingOne, BigDecimal(.05), BigDecimal(10), BigDecimal(0), BigDecimal(0))
+    .returning(expectedDesiredValuesOneNotTraded)
+
+    val actual =
+      valueDifferencesCalculator
+      .valueDifferences(portfolioDesign, portfolioSnapshotMissingOne, 0.05, 10d, 0d, 0d).map { vDiff =>
+        PortfolioValueDifference(vDiff.eTFCode, round(vDiff.valueDifference))
+      }
+
+    actual should contain theSameElementsAs expectedValueDifferenceOneNotTradedOneNotMatched
   }
 
 }

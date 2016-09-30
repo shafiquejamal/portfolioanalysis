@@ -15,7 +15,7 @@ class NewDesiredValuesCalculatorUTest extends FlatSpec with ShouldMatchers with 
   "The new desired value calculator" should "calculate the new desired value when the max dev is low but not " +
   "zero" in new DesiredValueFixture with Fixture {
     checkNewDesiredValue(
-      mockWeightDifferenceCalculator, 0.05, expectedDesiredValuesOneToBeTraded, 10d, 20d, 20d, portfolioSnapshot)
+      mockWeightDifferenceCalculator, 0.05, expectedDesiredValuesOneNotTraded, 10d, 20d, 20d, portfolioSnapshot)
   }
 
   it should "calculate the new desired value when the max dev is zero" in new DesiredValueFixture with Fixture {

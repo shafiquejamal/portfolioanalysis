@@ -10,10 +10,6 @@ case class ETFSelection(eTFCode: ETFCode, desiredWeight: BigDecimal) {
   require(desiredWeight >= 0 & desiredWeight <= 1)
 }
 
-case class PortfolioDesign(eTFSelections: Seq[ETFSelection], tolerance: BigDecimal = 0.00001) {
-  require(math.pow((eTFSelections.map(_.desiredWeight).sum - 1).toDouble, 2) <= tolerance)
-}
-
 case class ETFDataRaw(asOfDate: Timestamp, code: String, xnumber: String, nAV: Double, exDividend: Double)
 
 case class ETFDataPlus(

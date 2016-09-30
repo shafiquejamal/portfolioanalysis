@@ -1,5 +1,6 @@
 package com.eigenroute.portfolioanalysis
 
+import java.io.File
 import java.sql.Date
 
 import com.eigenroute.portfolioanalysis.investment.InvestmentPeriod
@@ -27,6 +28,7 @@ trait PortfolioFixture {
   val eTFDataPlusC = ETFDataPlus(now, eTFC, "1", 40, 0, 100, 0d)
   val eTFDataPlusD = ETFDataPlus(now, eTFD, "1", 50, 0, 40, 0d)
   val portfolioSnapshot = PortfolioSnapshot(Seq(eTFDataPlusA, eTFDataPlusB, eTFDataPlusC, eTFDataPlusD))
+  val portfolioSnapshotMissingOne = PortfolioSnapshot(Seq(eTFDataPlusA, eTFDataPlusC, eTFDataPlusD))
   val portfolioSnapshotZeroQuantity =
     PortfolioSnapshot(portfolioSnapshot.sameDateUniqueCodesETFDatas.map(_.copy(quantity = 0d)))
 
@@ -40,7 +42,7 @@ trait PortfolioFixture {
   def round(numberToRound: BigDecimal, n: Int = 5): BigDecimal = numberToRound.setScale(n, BigDecimal.RoundingMode.HALF_UP)
 
   trait DesiredValueFixture {
-    val expectedDesiredValuesOneToBeTraded = Seq(
+    val expectedDesiredValuesOneNotTraded = Seq(
       ETFDesiredValue(eTFA, 2355.88235, isToTrade = true),
       ETFDesiredValue(eTFB, 4711.76471, isToTrade = true),
       ETFDesiredValue(eTFC, 942.35294, isToTrade = true),
@@ -80,7 +82,14 @@ trait PortfolioFixture {
       PortfolioValueDifference(eTFB, 1711.76471),
       PortfolioValueDifference(eTFC, -3057.64706),
       PortfolioValueDifference(eTFD, 0.00000)
-                                                 )
+    )
+
+    val expectedValueDifferenceOneNotTradedOneNotMatched = Seq(
+      PortfolioValueDifference(eTFA, 1355.88235),
+      PortfolioValueDifference(eTFB, 4711.76471),
+      PortfolioValueDifference(eTFC, -3057.64706),
+      PortfolioValueDifference(eTFD, 0.00000)
+    )
 
     val expectedValueDifferenceNoTrades = Seq(
       PortfolioValueDifference(eTFA, 0d),
@@ -335,5 +344,9 @@ trait PortfolioFixture {
         ETFDataPlus(startDatePlus36monthsMinus1Day, eTFC, "1", 160, 1.75, 0, 0),
         ETFDataPlus(startDatePlus36monthsMinus1Day, eTFD, "1", 200, 0, 0, 0)
       )
+  }
+
+  trait PortfolioFiles {
+    val portfolioDesignPath = new File("src/test/scala/com/eigenroute/portfolioanalysis/portfolioDesign.csv")
   }
 }
