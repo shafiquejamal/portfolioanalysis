@@ -22,9 +22,9 @@ The same environment variables, databases, etc. must be set up for both projects
 
 Choose your parameters and files.
 
-- You must design your portfolio, and create a "portfolio design" csv file based on this. A same exists at:
+- You must design your portfolio, and create a "portfolio design" csv file based on this. A sample exists at:
  
-src/test/scala/com/eigenroute/portfolioanalysis/portfolioDesign.csv
+https://raw.githubusercontent.com/shafiquejamal/portfolioanalysis/master/src/test/scala/com/eigenroute/portfolioanalysis/portfolioDesign.csv
  
 It looks like this:
 
