@@ -72,6 +72,7 @@ java -jar target/scala-2.11/portfolio-simulation-assembly-1.0.jar 5 SemiAnnually
 Please do give me some feedback on these:
 
 - I assume everything is in the same currency, including the trading costs, initial investment, and the NAV, Ex-Dividend, etc. data that is in the database.
+- I assume no taxes, so for example all of this happens inside an RRSP or TFSA (and the fees are paid from inside, which I know is bad). 
 - I assume that only whole quantities of ETFs can be purchased (e.g. can't buy 0.237 shares of an ETF).
 - At each rebalancing interval, I rebalance only those securities whose weight in the portfolio (excluding accumulated Ex-Dividends and cash) is different from the desired weight by the maximum allowed deviation. Rebalancing the other securities might cause the new weight after rebalancing to be different by more than the maximum allowed deviation.
 - If there is enough cash left over from accumulated Ex-Dividends, previous rebalancing and transactions, I make sure to purchase more ETFs, even if this results in excessive weight deviation, because excessive deviation is less bad than having cash lying around in the account.
