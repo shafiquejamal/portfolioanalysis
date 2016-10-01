@@ -15,7 +15,8 @@ class MainATest extends FlatSpec with ShouldMatchers with PortfolioFixture {
       "9.99",
       "0.0011",
       "0.05",
-      portfolioDesignPath.getAbsolutePath
+      portfolioDesignPath.getAbsolutePath,
+      tempOutputFile.getAbsolutePath
     )
 
     Try(Main.main(args)) shouldBe a[Success[_]]

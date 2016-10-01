@@ -48,7 +48,7 @@ class PerformanceResultsRecorder(
 
   private def addKeyValue(sheet: XSSFSheet, rowNumber: Int, key: String, value: String): Unit =
     addRow(sheet, rowNumber, Seq(key, value))
-  
+
   private def addRow(sheet: XSSFSheet, rowNumber: Int, contents:Seq[String]): Unit = {
     val row = sheet.createRow(rowNumber)
     contents.zipWithIndex.foreach { case (content, index) =>

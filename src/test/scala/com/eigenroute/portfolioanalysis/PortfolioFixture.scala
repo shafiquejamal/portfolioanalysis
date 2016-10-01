@@ -476,10 +476,12 @@ trait PortfolioFixture {
             BigDecimal(expectedQuantitiesSemiAnnually(6).find(_.eTFCode == eTFData.eTFCode).map(_.quantity).getOrElse(0)),
           cash = 2.51041084806712616122265507941400
         )
-                                                                                                        }
+    }
   }
 
   trait PortfolioFiles {
     val portfolioDesignPath = new File("src/test/scala/com/eigenroute/portfolioanalysis/portfolioDesign.csv")
+    val tempOutputFile = File.createTempFile("tempfile", ".xlsx")
+    tempOutputFile.deleteOnExit()
   }
 }
