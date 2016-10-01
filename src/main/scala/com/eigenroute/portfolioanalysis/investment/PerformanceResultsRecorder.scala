@@ -4,6 +4,8 @@ import com.eigenroute.portfolioanalysis.rebalancing.PortfolioDesign
 import org.apache.poi.xssf.usermodel.{XSSFSheet, XSSFWorkbook}
 import org.joda.time.format.DateTimeFormat
 
+import scala.util.{Failure, Success, Try}
+
 class PerformanceResultsRecorder(
     investmentDurationInYears: Int,
     rebalancingInterval: RebalancingInterval,
@@ -24,11 +26,11 @@ class PerformanceResultsRecorder(
     addKeyValue(paramsSheet, 2, "Initial Investment", initialInvestment.toString)
     addKeyValue(paramsSheet, 3, "Cost to trade ETF", perTransactionTradingCost.toString)
     addKeyValue(paramsSheet, 4, "Bid-Ask cost as a fraction of NAV", bidAskCostFractionOfNav.toString)
-    addKeyValue(paramsSheet, 5, "Maximum allowed deviation from desired weights (percentage points)",
+    addKeyValue(paramsSheet, 5, "Maximum allowed deviation from desired weights (percentage points/100)",
       maxAllowedDeviation.toString)
-    addKeyValue(paramsSheet, 6, "Portfolio Design", "")
+    addKeyValue(paramsSheet, 7, "Portfolio Design", "")
     portfolioDesign.eTFSelections.zipWithIndex.foreach { case (selection, index) =>
-      addKeyValue(paramsSheet, 6 + index, selection.eTFCode.code, selection.desiredWeight.toString)
+      addKeyValue(paramsSheet, 8 + index, selection.eTFCode.code, selection.desiredWeight.toString)
     }
 
     val resultsSheet = wb.createSheet("Results")
@@ -53,7 +55,12 @@ class PerformanceResultsRecorder(
     val row = sheet.createRow(rowNumber)
     contents.zipWithIndex.foreach { case (content, index) =>
       val cell = row.createCell(index)
-      cell.setCellValue(content)
+      Try(content.toDouble) match {
+        case Success(success) =>
+          cell.setCellValue(success)
+        case Failure(_) =>
+          cell.setCellValue(content)
+      }
     }
   }
 

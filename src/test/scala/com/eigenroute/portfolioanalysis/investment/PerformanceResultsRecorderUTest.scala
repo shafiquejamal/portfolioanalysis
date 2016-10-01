@@ -22,11 +22,11 @@ class PerformanceResultsRecorderUTest extends FlatSpec with ShouldMatchers with 
     val wb = recorder.write("yy,M,d")
 
     wb.getSheetAt(0).getRow(2).getCell(0).getStringCellValue shouldEqual "Initial Investment"
-    wb.getSheetAt(0).getRow(2).getCell(1).getStringCellValue shouldEqual "234000"
+    wb.getSheetAt(0).getRow(2).getCell(1).getNumericCellValue shouldEqual 234000d
 
     wb.getSheetAt(1).getRow(3).getCell(0).getStringCellValue shouldEqual "16,1,3"
     wb.getSheetAt(1).getRow(3).getCell(1).getStringCellValue shouldEqual "22,1,3"
-    wb.getSheetAt(1).getRow(3).getCell(2).getStringCellValue shouldEqual "1.52"
+    wb.getSheetAt(1).getRow(3).getCell(2).getNumericCellValue shouldEqual 1.52
 
     recorder.write().getSheetAt(1).getRow(3).getCell(1).getStringCellValue shouldEqual "2022-01-03"
   }
