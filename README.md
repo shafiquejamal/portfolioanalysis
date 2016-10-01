@@ -6,7 +6,7 @@ This project analyzes the historical performance of a portfolio of ETFs. I got t
 
 http://www.greaterfool.ca/
 
-In many posts he claims that a balanced portfolio held long enough (I think he says 10 years) will return about 7% annually (e.g. see http://www.greaterfool.ca/2014/04/25/planning-6/ and http://www.greaterfool.ca/2014/05/15/the-millennial-portfolio/). In one post, he even gave an example of some ETFs one might choose (http://www.greaterfool.ca/2014/11/21/trust-4/). For these, there is common dates data for only about 5 or 6 years (I think the latest one started some time in 2010). So I decided to see for myself whether these claims were plausible. See below for results.
+In many posts he claims that a balanced portfolio held long enough (I think he says 10 years) will return about 7% annually (e.g. see [this post](http://www.greaterfool.ca/2014/04/25/planning-6/) and [this one too](http://www.greaterfool.ca/2014/05/15/the-millennial-portfolio/)). In [one post](http://www.greaterfool.ca/2014/11/21/trust-4/), he even gave an example of some ETFs one might choose. For these, there is common dates data for only about 5 or 6 years (I think the latest one started some time in 2010). So I decided to see for myself whether these claims were plausible. See below for results.
  
 
 ## Requirements
@@ -16,11 +16,11 @@ In many posts he claims that a balanced portfolio held long enough (I think he s
 
 https://github.com/shafiquejamal/ishares-etf-data-download
 
-(The same environment variables, databases, etc. must be set up for both projects, an you must run that one before running this one in order to have all the latest ETF data (NAV, etc.)
+The same environment variables, databases, etc. must be set up for both projects, an you must run that one before running this one in order to have all the latest ETF data (NAV, etc.)
 
 ## How to use
 
-1. Choose your parameters and files.
+Choose your parameters and files.
 
 - You must design your portfolio, and create a "portfolio design" csv file based on this. A same exists at:
  
@@ -47,6 +47,7 @@ So ETF "XRE" has a desired weight of 5% of the total portfolio value, ETF "XSP" 
 
 Assuming the following:
 
+```
 Investment duration (years): 5
 Rebalancing interval: SemiAnnually
 Initial investment: 100060
@@ -54,8 +55,9 @@ ETF Trading cost: 9.99
 Bid-ask cost: 0.11%
 Path to portfolio design file: `/path/to/portfolioDesign.csv`
 Path to output file: `/path/to/output.xlsx`
+```
 
-Then at the command line (assumning you've already set the environment variables, set up the databases (test and prod), and sucessfully run the `ishares-etf-data-download` project), you would clone the repository, create the fat jar, and run it:                                                 
+Then at the command line (assuming you've already set the environment variables, set up the databases (test and prod), and sucessfully run the `ishares-etf-data-download` project), you would clone the repository, create the fat jar, and run it:                                                 
                                                  
 ```
 cd /path/to/wherever/you/want/to/put/this/project
@@ -71,7 +73,7 @@ Please do give me some feedback on these:
 
 - I assume everything is in the same currency, including the trading costs, initial investment, and the NAV, Ex-Dividend, etc. data that is in the database.
 - I assume that only whole quantities of ETFs can be purchased (e.g. can't buy 0.237 shares of an ETF).
-- At each rebalancing interval, I rebalance only those securities whose weight in the portfolio (excluding accumulated Ex-Dividends and cash) is different from the desired weight by the maximum allowed deviation. Rebalancing the other securities might cause the weight to be different by more than the maximum allowed deviation.
+- At each rebalancing interval, I rebalance only those securities whose weight in the portfolio (excluding accumulated Ex-Dividends and cash) is different from the desired weight by the maximum allowed deviation. Rebalancing the other securities might cause the new weight after rebalancing to be different by more than the maximum allowed deviation.
 - If there is enough cash left over from accumulated Ex-Dividends, previous rebalancing and transactions, I make sure to purchase more ETFs, even if this results in excessive weight deviation, because excessive deviation is less bad than having cash lying around in the account.
 - To calculate annual average return, I assume that at the end the portfolio will be liquidated and so account for trading and bid-ask costs.
 - I assume that ETF annual fees and commission are taken care of internally.
