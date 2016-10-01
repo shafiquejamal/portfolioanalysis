@@ -53,8 +53,8 @@ Rebalancing interval: SemiAnnually
 Initial investment: 100060
 ETF Trading cost: 9.99
 Bid-ask cost: 0.11%
-Path to portfolio design file: `/path/to/portfolioDesign.csv`
-Path to output file: `/path/to/output.xlsx`
+Path to portfolio design file: /path/to/portfolioDesign.csv
+Path to output file: /path/to/output.xlsx
 ```
 
 Then at the command line (assuming you've already set the environment variables, set up the databases (test and prod), and sucessfully run the `ishares-etf-data-download` project), you would clone the repository, create the fat jar, and run it:                                                 
