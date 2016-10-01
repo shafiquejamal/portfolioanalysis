@@ -14,6 +14,8 @@ libraryDependencies ++= Seq(
   "org.scalikejdbc" %% "scalikejdbc" % "2.4.2",
   "com.typesafe" % "config" % "1.3.0",
   "org.flywaydb" % "flyway-core" % "4.0.3",
+  "org.apache.poi" % "poi" % "3.15",
+  "org.apache.poi" % "poi-ooxml" % "3.15",
   "org.scalamock" %% "scalamock-scalatest-support" % "3.2.2" % Test,
   "org.scalatest" %% "scalatest" % "2.2.6" % Test)
 
