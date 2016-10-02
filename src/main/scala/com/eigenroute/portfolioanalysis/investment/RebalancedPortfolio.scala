@@ -1,9 +1,9 @@
 package com.eigenroute.portfolioanalysis.investment
 
-import com.eigenroute.portfolioanalysis.rebalancing.{ETFDataPlus, FinalPortfolioQuantityToHave, PortfolioSnapshot}
+import com.eigenroute.portfolioanalysis.rebalancing.{ETFData, FinalPortfolioQuantityToHave, PortfolioSnapshot}
 
 case class RebalancedPortfolio(
-    rebalancedETFData: Seq[ETFDataPlus],
+    rebalancedETFData: Seq[ETFData],
     newQuantitiesChosenForThisRebalancing: Seq[FinalPortfolioQuantityToHave],
     accumulatedExDiv: BigDecimal,
     accumulatedCash: BigDecimal,

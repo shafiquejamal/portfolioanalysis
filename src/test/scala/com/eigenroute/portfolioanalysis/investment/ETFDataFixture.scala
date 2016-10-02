@@ -2,7 +2,7 @@ package com.eigenroute.portfolioanalysis.investment
 
 import java.util.UUID
 
-import com.eigenroute.portfolioanalysis.rebalancing.{ETFCode, ETFDataPlus}
+import com.eigenroute.portfolioanalysis.rebalancing.{ETFCode, ETFData}
 import org.joda.time.DateTime
 import scalikejdbc._
 
@@ -19,14 +19,14 @@ trait ETFDataFixture {
 
   val now = new DateTime(2016, 6, 1, 0, 0, 0)
 
-  val eTFDataAAA1 = ETFDataPlus(date1, ETFCode("AAA"), "1", 110, 25, 0, 0)
-  val eTFDataAAA2 = ETFDataPlus(dateLater, ETFCode("AAA"), "1", 111, 26, 0, 0)
-  val eTFDataBBB1 = ETFDataPlus(date1, ETFCode("BBB"), "1", 120, 35, 0, 0)
-  val eTFDataBBB2 = ETFDataPlus(dateLater, ETFCode("BBB"), "1", 121, 36, 0, 0)
-  val eTFDataCCC1 = ETFDataPlus(date1, ETFCode("CCC"), "1", 130, 45, 0, 0)
-  val eTFDataCCC2 = ETFDataPlus(dateLater, ETFCode("CCC"), "1", 131, 46, 0, 0)
-  val eTFDataDDD1 = ETFDataPlus(date1, ETFCode("DDD"), "1", 130, 45, 0, 0)
-  val eTFDataDDD2 = ETFDataPlus(dateLater, ETFCode("DDD"), "1", 131, 46, 0, 0)
+  val eTFDataAAA1 = ETFData(date1, ETFCode("AAA"), "1", 110, 25, 0)
+  val eTFDataAAA2 = ETFData(dateLater, ETFCode("AAA"), "1", 111, 26, 0)
+  val eTFDataBBB1 = ETFData(date1, ETFCode("BBB"), "1", 120, 35, 0)
+  val eTFDataBBB2 = ETFData(dateLater, ETFCode("BBB"), "1", 121, 36, 0)
+  val eTFDataCCC1 = ETFData(date1, ETFCode("CCC"), "1", 130, 45, 0)
+  val eTFDataCCC2 = ETFData(dateLater, ETFCode("CCC"), "1", 131, 46, 0)
+  val eTFDataDDD1 = ETFData(date1, ETFCode("DDD"), "1", 130, 45, 0)
+  val eTFDataDDD2 = ETFData(dateLater, ETFCode("DDD"), "1", 131, 46, 0)
 
   val eTFDataToAdd = Seq(
     sql"""INSERT INTO historical (id, code, brand, xnumber, indexreturn, nav, asofdate, exdividend, createdat) values

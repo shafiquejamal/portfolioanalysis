@@ -16,7 +16,7 @@ class PortfolioSnapshotUTest extends FlatSpec with ShouldMatchers with Portfolio
         eTFDataPlusB,
         eTFDataPlusC,
         eTFDataPlusD,
-        ETFDataPlus(new DateTime(2016, 1, 2, 1, 1, 1), eTFA, "", 20, 0, 50, 0d)
+        ETFData(new DateTime(2016, 1, 2, 1, 1, 1), eTFA, "", 20, 0, 50)
       )
 
     Try(PortfolioSnapshot(invalidData)).failure.exception shouldBe a[RuntimeException]

@@ -2,7 +2,7 @@ package com.eigenroute.portfolioanalysis.investment
 
 import com.eigenroute.portfolioanalysis.PortfolioFixture
 import com.eigenroute.portfolioanalysis.investment.RebalancingInterval.{Annually, Monthly, Quarterly, SemiAnnually}
-import com.eigenroute.portfolioanalysis.rebalancing.{ETFDataPlus, FinalPortfolioQuantityToHave}
+import com.eigenroute.portfolioanalysis.rebalancing.{ETFData, FinalPortfolioQuantityToHave}
 import org.joda.time.DateTime
 import org.scalatest.{FlatSpec, ShouldMatchers}
 
@@ -45,7 +45,7 @@ class InvestmentATest extends FlatSpec with ShouldMatchers with PortfolioFixture
         investmentPeriodOneYear, Quarterly, 10040, 10, 0.0011, portfolioDesign, 0, investmentInputDataQuarterly)
     val expectedRebalancedData = filterAndRound(expectedRebalancedPortfolioQuarterly, startDatePlus12months)
     val rebalancedPortfolio = investment.rebalancePortfolio
-    val actualRebalancedData = collectAndRound(rebalancedPortfolio.rebalancedETFData)
+    val actualRebalancedData = rebalancedPortfolio.rebalancedETFData
 
     actualRebalancedData should contain theSameElementsAs expectedRebalancedData
     rebalancedPortfolio.accumulatedExDiv shouldEqual 20
@@ -70,7 +70,7 @@ class InvestmentATest extends FlatSpec with ShouldMatchers with PortfolioFixture
         investmentPeriodThreeYears, SemiAnnually, 10040, 10, 0.0011, portfolioDesign, 0.05, investmentInputDataSemiAnnually)
     val expectedRebalancedData = filterAndRound(expectedRebalancedPortfolioSemiAnnually, startDatePlus36months)
     val rebalancedPortfolio = investment.rebalancePortfolio
-    val actualRebalancedData = collectAndRound(rebalancedPortfolio.rebalancedETFData)
+    val actualRebalancedData = rebalancedPortfolio.rebalancedETFData
 
     actualRebalancedData should contain theSameElementsAs expectedRebalancedData
     rebalancedPortfolio.accumulatedExDiv shouldEqual 1.75
@@ -86,10 +86,6 @@ class InvestmentATest extends FlatSpec with ShouldMatchers with PortfolioFixture
     round(rebalancedPortfolio.portfolioPerformance.averageAnnualReturnFraction, 11) shouldEqual round(1.140148678530547, 11)
   }
 
-  private def roundCashValue(eTFData: ETFDataPlus) = eTFData.copy(cash = round(eTFData.cash))
-
-  private def collectAndRound(eTFData: Seq[ETFDataPlus]) = eTFData.map(roundCashValue)
-
-  private def filterAndRound(eTFData: Seq[ETFDataPlus], endDate :DateTime) =
-    eTFData.filter { eTFData => eTFData.asOfDate.isBefore(endDate)}.map(roundCashValue)
+  private def filterAndRound(eTFData: Seq[ETFData], endDate :DateTime) =
+    eTFData.filter { eTFData => eTFData.asOfDate.isBefore(endDate)}
 }

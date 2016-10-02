@@ -1,6 +1,6 @@
 package com.eigenroute.portfolioanalysis.investment
 
-import com.eigenroute.portfolioanalysis.rebalancing.{ETFDataPlus, PortfolioDesign}
+import com.eigenroute.portfolioanalysis.rebalancing.{ETFData, PortfolioDesign}
 
 class PortfolioSimulation(
     investmentDurationInYears: Int,
@@ -10,7 +10,7 @@ class PortfolioSimulation(
     bidAskCostFractionOfNav: BigDecimal,
     portfolioDesign: PortfolioDesign,
     maxAllowedDeviation: BigDecimal,
-    sortedCommonDatesETFData:Seq[ETFDataPlus]) {
+    sortedCommonDatesETFData:Seq[ETFData]) {
 
   def simulate: Seq[PortfolioPerformance] = {
     val investmentPeriods =

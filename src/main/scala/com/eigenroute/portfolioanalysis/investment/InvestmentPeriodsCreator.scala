@@ -1,12 +1,12 @@
 package com.eigenroute.portfolioanalysis.investment
 
-import com.eigenroute.portfolioanalysis.rebalancing.{ETFDataPlus, PortfolioDesign}
+import com.eigenroute.portfolioanalysis.rebalancing.{ETFData, PortfolioDesign}
 import org.joda.time.{DateTime, Days}
 
 class InvestmentPeriodsCreator(
-  portfolioDesign: PortfolioDesign,
-  sortedCommonDatesETFData:Seq[ETFDataPlus],
-  investmentDurationYears: Int) {
+    portfolioDesign: PortfolioDesign,
+    sortedCommonDatesETFData:Seq[ETFData],
+    investmentDurationYears: Int) {
 
   val allDates: List[DateTime] =
     sortedCommonDatesETFData.toList.map(_.asOfDate)

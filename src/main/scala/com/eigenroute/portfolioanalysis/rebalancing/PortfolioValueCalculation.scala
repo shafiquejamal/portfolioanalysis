@@ -5,7 +5,7 @@ trait PortfolioValueCalculation {
   def portfolioValueETFsOnly(portfolioSnapshot: PortfolioSnapshot): BigDecimal =
     portfolioValueFromETFDatas(portfolioSnapshot.sameDateUniqueCodesETFDatas)
 
-  def portfolioValueFromETFDatas(eTFDatas: Seq[ETFDataPlus]): BigDecimal =
+  def portfolioValueFromETFDatas(eTFDatas: Seq[ETFData]): BigDecimal =
     eTFDatas.map { eTFData => eTFData.nAV * eTFData.quantity }.sum
 
   def actualValue(portfolioSnapshot: PortfolioSnapshot, eTFCode: ETFCode): BigDecimal =

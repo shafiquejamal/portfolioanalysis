@@ -21,10 +21,10 @@ trait PortfolioFixture {
   val eTFDSelection = ETFSelection(eTFD, 0.15)
   val portfolioDesign = PortfolioDesign(Seq(eTFASelection, eTFBSelection, eTFCSelection, eTFDSelection))
 
-  val eTFDataPlusA = ETFDataPlus(now, eTFA, "1", 20, 0, 50, 0d)
-  val eTFDataPlusB = ETFDataPlus(now, eTFB, "1", 30, 0, 100, 0d)
-  val eTFDataPlusC = ETFDataPlus(now, eTFC, "1", 40, 0, 100, 0d)
-  val eTFDataPlusD = ETFDataPlus(now, eTFD, "1", 50, 0, 40, 0d)
+  val eTFDataPlusA = ETFData(now, eTFA, "1", 20, 0, 50)
+  val eTFDataPlusB = ETFData(now, eTFB, "1", 30, 0, 100)
+  val eTFDataPlusC = ETFData(now, eTFC, "1", 40, 0, 100)
+  val eTFDataPlusD = ETFData(now, eTFD, "1", 50, 0, 40)
   val portfolioSnapshot = PortfolioSnapshot(Seq(eTFDataPlusA, eTFDataPlusB, eTFDataPlusC, eTFDataPlusD))
   val portfolioSnapshotMissingOne = PortfolioSnapshot(Seq(eTFDataPlusA, eTFDataPlusC, eTFDataPlusD))
   val portfolioSnapshotZeroQuantity =
@@ -231,24 +231,25 @@ trait PortfolioFixture {
 
     val sortedCommonDatesETFData = portfolioDesign.eTFSelections.flatMap { selection =>
       0.to(maxDaysToAdd).map { daysToAdd =>
-        ETFDataPlus(
+        ETFData(
           commonStartDate.plusDays(daysToAdd),
           selection.eTFCode,
           "1",
-          eTFPrices(selection.eTFCode), 0d, 0d, 0)
+          eTFPrices(selection.eTFCode), 0d, 0d)
       }.toSeq
     }
 
-    val sortedCommonDatesLessDatesToOmitPlusNonCommon = (sortedCommonDatesETFData ++ Seq(
-      ETFDataPlus(new DateTime(commonStartDate.minusDays(1)), eTFA, "1", 20d, 0d, 0d, 0),
-      ETFDataPlus(new DateTime(commonStartDate.minusDays(2)), eTFB, "1", 30d, 0d, 0d, 0),
-      ETFDataPlus(new DateTime(commonStartDate.minusDays(3)), eTFC, "1", 40d, 0d, 0d, 0),
-      ETFDataPlus(new DateTime(commonStartDate.minusDays(4)), eTFD, "1", 50d, 0d, 0d, 0)
-    ) ++ Seq(
-      ETFDataPlus(new DateTime(commonStartDate.plusDays(maxDaysToAdd + 1)), eTFA, "1", 0d, 0d, 0d, 0),
-      ETFDataPlus(new DateTime(commonStartDate.plusDays(maxDaysToAdd + 2)), eTFB, "1", 0d, 0d, 0d, 0),
-      ETFDataPlus(new DateTime(commonStartDate.plusDays(maxDaysToAdd + 3)), eTFC, "1", 0d, 0d, 0d, 0),
-      ETFDataPlus(new DateTime(commonStartDate.plusDays(maxDaysToAdd + 4)), eTFD, "1", 0d, 0d, 0d, 0)
+    val sortedCommonDatesLessDatesToOmitPlusNonCommon = (sortedCommonDatesETFData ++
+      Seq(
+        ETFData(new DateTime(commonStartDate.minusDays(1)), eTFA, "1", 20d, 0d, 0d),
+        ETFData(new DateTime(commonStartDate.minusDays(2)), eTFB, "1", 30d, 0d, 0d),
+        ETFData(new DateTime(commonStartDate.minusDays(3)), eTFC, "1", 40d, 0d, 0d),
+        ETFData(new DateTime(commonStartDate.minusDays(4)), eTFD, "1", 50d, 0d, 0d)
+      ) ++ Seq(
+        ETFData(new DateTime(commonStartDate.plusDays(maxDaysToAdd + 1)), eTFA, "1", 0d, 0d, 0d),
+        ETFData(new DateTime(commonStartDate.plusDays(maxDaysToAdd + 2)), eTFB, "1", 0d, 0d, 0d),
+        ETFData(new DateTime(commonStartDate.plusDays(maxDaysToAdd + 3)), eTFC, "1", 0d, 0d, 0d),
+        ETFData(new DateTime(commonStartDate.plusDays(maxDaysToAdd + 4)), eTFD, "1", 0d, 0d, 0d)
     )).filterNot{ eTFData => datesToOmit.contains(eTFData.asOfDate)}.sortBy(_.asOfDate.getMillis)
 
     val startDatePlus1Day = startDate.plusDays(1)
@@ -267,80 +268,80 @@ trait PortfolioFixture {
     val startDatePlus12monthsMinus1Day = startDatePlus12months.minusDays(1)
     val startDatePlus24monthsMinus1Day = startDatePlus24months.minusDays(1)
     val startDatePlus36monthsMinus1Day = startDatePlus36months.minusDays(1)
-    val investmentInputDataQuarterly: Seq[ETFDataPlus] =
-      Seq[ETFDataPlus](
-      ETFDataPlus(startDate, eTFA, "1", 20, 1, 0, 0),
-      ETFDataPlus(startDate, eTFB, "1", 30, 2, 0, 0),
-      ETFDataPlus(startDate, eTFC, "1", 40, 3, 0, 0),
-      ETFDataPlus(startDate, eTFD, "1", 50, 4, 0, 0),
-      ETFDataPlus(startDatePlus1Day, eTFA, "1", 120, 5, 0, 0),
-      ETFDataPlus(startDatePlus1Day, eTFB, "1", 130, 6, 0, 0),
-      ETFDataPlus(startDatePlus1Day, eTFC, "1", 140, 7, 0, 0),
-      ETFDataPlus(startDatePlus1Day, eTFD, "1", 150, 8, 0, 0),
-      ETFDataPlus(startDatePlus3months, eTFA, "1", 30, 0, 0, 0),
-      ETFDataPlus(startDatePlus3months, eTFB, "1", 25, 0, 0, 0),
-      ETFDataPlus(startDatePlus3months, eTFC, "1", 60, 0, 0, 0),
-      ETFDataPlus(startDatePlus3months, eTFD, "1", 40, 0, 0, 0),
-      ETFDataPlus(startDatePlus3monthsPlus1Day, eTFA, "1", 230, 6, 0, 0),
-      ETFDataPlus(startDatePlus3monthsPlus1Day, eTFB, "1", 225, 7, 0, 0),
-      ETFDataPlus(startDatePlus3monthsPlus1Day, eTFC, "1", 260, 8, 0, 0),
-      ETFDataPlus(startDatePlus3monthsPlus1Day, eTFD, "1", 240, 9, 0, 0),
-      ETFDataPlus(startDatePlus6months, eTFA, "1", 10, 0, 0, 0),
-      ETFDataPlus(startDatePlus6months, eTFB, "1", 50, 0, 0, 0),
-      ETFDataPlus(startDatePlus6months, eTFC, "1", 80, 0, 0, 0),
-      ETFDataPlus(startDatePlus6months, eTFD, "1", 60, 0, 0, 0),
-      ETFDataPlus(startDatePlus6monthsPlus1Day, eTFA, "1", 330, 0, 0, 0),
-      ETFDataPlus(startDatePlus6monthsPlus1Day, eTFB, "1", 325, 0, 0, 0),
-      ETFDataPlus(startDatePlus6monthsPlus1Day, eTFC, "1", 360, 0, 0, 0),
-      ETFDataPlus(startDatePlus6monthsPlus1Day, eTFD, "1", 340, 0, 0, 0),
-      ETFDataPlus(startDatePlus9months, eTFA, "1", 30, 0, 0, 0),
-      ETFDataPlus(startDatePlus9months, eTFB, "1", 45, 0, 0, 0),
-      ETFDataPlus(startDatePlus9months, eTFC, "1", 55, 0, 0, 0),
-      ETFDataPlus(startDatePlus9months, eTFD, "1", 70, 0, 0, 0),
-      ETFDataPlus(startDatePlus9monthsPlus1Day, eTFA, "1", 430, 0, 0, 0),
-      ETFDataPlus(startDatePlus9monthsPlus1Day, eTFB, "1", 445, 0, 0, 0),
-      ETFDataPlus(startDatePlus9monthsPlus1Day, eTFC, "1", 455, 0, 0, 0),
-      ETFDataPlus(startDatePlus9monthsPlus1Day, eTFD, "1", 470, 0, 0, 0),
-      ETFDataPlus(startDatePlus12monthsMinus1Day, eTFA, "1", 35, 2, 0, 0),
-      ETFDataPlus(startDatePlus12monthsMinus1Day, eTFB, "1", 50, 4, 0, 0),
-      ETFDataPlus(startDatePlus12monthsMinus1Day, eTFC, "1", 45, 6, 0, 0),
-      ETFDataPlus(startDatePlus12monthsMinus1Day, eTFD, "1", 65, 8, 0, 0),
-      ETFDataPlus(startDatePlus12months, eTFA, "1", 35, 0, 0, 0),
-      ETFDataPlus(startDatePlus12months, eTFB, "1", 50, 0, 0, 0),
-      ETFDataPlus(startDatePlus12months, eTFC, "1", 45, 0, 0, 0),
-      ETFDataPlus(startDatePlus12months, eTFD, "1", 65, 0, 0, 0),
-      ETFDataPlus(startDatePlus12monthsPlus1Day, eTFA, "1", 535, 0, 0, 0),
-      ETFDataPlus(startDatePlus12monthsPlus1Day, eTFB, "1", 550, 0, 0, 0),
-      ETFDataPlus(startDatePlus12monthsPlus1Day, eTFC, "1", 545, 0, 0, 0),
-      ETFDataPlus(startDatePlus12monthsPlus1Day, eTFD, "1", 565, 0, 0, 0)
-    )
+    val investmentInputDataQuarterly: Seq[ETFData] =
+      Seq(
+        ETFData(startDate, eTFA, "1", 20, 1, 0),
+        ETFData(startDate, eTFB, "1", 30, 2, 0),
+        ETFData(startDate, eTFC, "1", 40, 3, 0),
+        ETFData(startDate, eTFD, "1", 50, 4, 0),
+        ETFData(startDatePlus1Day, eTFA, "1", 120, 5, 0),
+        ETFData(startDatePlus1Day, eTFB, "1", 130, 6, 0),
+        ETFData(startDatePlus1Day, eTFC, "1", 140, 7, 0),
+        ETFData(startDatePlus1Day, eTFD, "1", 150, 8, 0),
+        ETFData(startDatePlus3months, eTFA, "1", 30, 0, 0),
+        ETFData(startDatePlus3months, eTFB, "1", 25, 0, 0),
+        ETFData(startDatePlus3months, eTFC, "1", 60, 0, 0),
+        ETFData(startDatePlus3months, eTFD, "1", 40, 0, 0),
+        ETFData(startDatePlus3monthsPlus1Day, eTFA, "1", 230, 6, 0),
+        ETFData(startDatePlus3monthsPlus1Day, eTFB, "1", 225, 7, 0),
+        ETFData(startDatePlus3monthsPlus1Day, eTFC, "1", 260, 8, 0),
+        ETFData(startDatePlus3monthsPlus1Day, eTFD, "1", 240, 9, 0),
+        ETFData(startDatePlus6months, eTFA, "1", 10, 0, 0),
+        ETFData(startDatePlus6months, eTFB, "1", 50, 0, 0),
+        ETFData(startDatePlus6months, eTFC, "1", 80, 0, 0),
+        ETFData(startDatePlus6months, eTFD, "1", 60, 0, 0),
+        ETFData(startDatePlus6monthsPlus1Day, eTFA, "1", 330, 0, 0),
+        ETFData(startDatePlus6monthsPlus1Day, eTFB, "1", 325, 0, 0),
+        ETFData(startDatePlus6monthsPlus1Day, eTFC, "1", 360, 0, 0),
+        ETFData(startDatePlus6monthsPlus1Day, eTFD, "1", 340, 0, 0),
+        ETFData(startDatePlus9months, eTFA, "1", 30, 0, 0),
+        ETFData(startDatePlus9months, eTFB, "1", 45, 0, 0),
+        ETFData(startDatePlus9months, eTFC, "1", 55, 0, 0),
+        ETFData(startDatePlus9months, eTFD, "1", 70, 0, 0),
+        ETFData(startDatePlus9monthsPlus1Day, eTFA, "1", 430, 0, 0),
+        ETFData(startDatePlus9monthsPlus1Day, eTFB, "1", 445, 0, 0),
+        ETFData(startDatePlus9monthsPlus1Day, eTFC, "1", 455, 0, 0),
+        ETFData(startDatePlus9monthsPlus1Day, eTFD, "1", 470, 0, 0),
+        ETFData(startDatePlus12monthsMinus1Day, eTFA, "1", 35, 2, 0),
+        ETFData(startDatePlus12monthsMinus1Day, eTFB, "1", 50, 4, 0),
+        ETFData(startDatePlus12monthsMinus1Day, eTFC, "1", 45, 6, 0),
+        ETFData(startDatePlus12monthsMinus1Day, eTFD, "1", 65, 8, 0),
+        ETFData(startDatePlus12months, eTFA, "1", 35, 0, 0),
+        ETFData(startDatePlus12months, eTFB, "1", 50, 0, 0),
+        ETFData(startDatePlus12months, eTFC, "1", 45, 0, 0),
+        ETFData(startDatePlus12months, eTFD, "1", 65, 0, 0),
+        ETFData(startDatePlus12monthsPlus1Day, eTFA, "1", 535, 0, 0),
+        ETFData(startDatePlus12monthsPlus1Day, eTFB, "1", 550, 0, 0),
+        ETFData(startDatePlus12monthsPlus1Day, eTFC, "1", 545, 0, 0),
+        ETFData(startDatePlus12monthsPlus1Day, eTFD, "1", 565, 0, 0)
+      )
 
     val investmentInputDataSemiAnnually = investmentInputDataQuarterly ++
       Seq(
-        ETFDataPlus(startDatePlus18months, eTFA, "1", 40, 0, 0, 0),
-        ETFDataPlus(startDatePlus18months, eTFB, "1", 60, 0, 0, 0),
-        ETFDataPlus(startDatePlus18months, eTFC, "1", 80, 0, 0, 0),
-        ETFDataPlus(startDatePlus18months, eTFD, "1", 100, 0, 0, 0),
-        ETFDataPlus(startDatePlus24months, eTFA, "1", 150, 0, 0, 0),
-        ETFDataPlus(startDatePlus24months, eTFB, "1", 120, 0, 0, 0),
-        ETFDataPlus(startDatePlus24months, eTFC, "1", 90, 0, 0, 0),
-        ETFDataPlus(startDatePlus24months, eTFD, "1", 60, 0, 0, 0),
-        ETFDataPlus(startDatePlus24monthsMinus1Day, eTFA, "1", 85, 0, 0, 0),
-        ETFDataPlus(startDatePlus24monthsMinus1Day, eTFB, "1", 125, 0, 0, 0),
-        ETFDataPlus(startDatePlus24monthsMinus1Day, eTFC, "1", 165, 0, 0, 0),
-        ETFDataPlus(startDatePlus24monthsMinus1Day, eTFD, "1", 205, 0, 0, 0),
-        ETFDataPlus(startDatePlus30months, eTFA, "1", 110, 0, 0, 0),
-        ETFDataPlus(startDatePlus30months, eTFB, "1", 90, 0, 0, 0),
-        ETFDataPlus(startDatePlus30months, eTFC, "1", 20, 0, 0, 0),
-        ETFDataPlus(startDatePlus30months, eTFD, "1", 140, 0, 0, 0),
-        ETFDataPlus(startDatePlus36months, eTFA, "1", 75, 0, 0, 0),
-        ETFDataPlus(startDatePlus36months, eTFB, "1", 115, 0, 0, 0),
-        ETFDataPlus(startDatePlus36months, eTFC, "1", 155, 1.75, 0, 0),
-        ETFDataPlus(startDatePlus36months, eTFD, "1", 195, 0, 0, 0),
-        ETFDataPlus(startDatePlus36monthsMinus1Day, eTFA, "1", 80, 0, 0, 0),
-        ETFDataPlus(startDatePlus36monthsMinus1Day, eTFB, "1", 120, 0, 0, 0),
-        ETFDataPlus(startDatePlus36monthsMinus1Day, eTFC, "1", 160, 1.75, 0, 0),
-        ETFDataPlus(startDatePlus36monthsMinus1Day, eTFD, "1", 200, 0, 0, 0)
+        ETFData(startDatePlus18months, eTFA, "1", 40, 0, 0),
+        ETFData(startDatePlus18months, eTFB, "1", 60, 0, 0),
+        ETFData(startDatePlus18months, eTFC, "1", 80, 0, 0),
+        ETFData(startDatePlus18months, eTFD, "1", 100, 0, 0),
+        ETFData(startDatePlus24months, eTFA, "1", 150, 0, 0),
+        ETFData(startDatePlus24months, eTFB, "1", 120, 0, 0),
+        ETFData(startDatePlus24months, eTFC, "1", 90, 0, 0),
+        ETFData(startDatePlus24months, eTFD, "1", 60, 0, 0),
+        ETFData(startDatePlus24monthsMinus1Day, eTFA, "1", 85, 0, 0),
+        ETFData(startDatePlus24monthsMinus1Day, eTFB, "1", 125, 0, 0),
+        ETFData(startDatePlus24monthsMinus1Day, eTFC, "1", 165, 0, 0),
+        ETFData(startDatePlus24monthsMinus1Day, eTFD, "1", 205, 0, 0),
+        ETFData(startDatePlus30months, eTFA, "1", 110, 0, 0),
+        ETFData(startDatePlus30months, eTFB, "1", 90, 0, 0),
+        ETFData(startDatePlus30months, eTFC, "1", 20, 0, 0),
+        ETFData(startDatePlus30months, eTFD, "1", 140, 0, 0),
+        ETFData(startDatePlus36months, eTFA, "1", 75, 0, 0),
+        ETFData(startDatePlus36months, eTFB, "1", 115, 0, 0),
+        ETFData(startDatePlus36months, eTFC, "1", 155, 1.75, 0),
+        ETFData(startDatePlus36months, eTFD, "1", 195, 0, 0),
+        ETFData(startDatePlus36monthsMinus1Day, eTFA, "1", 80, 0, 0),
+        ETFData(startDatePlus36monthsMinus1Day, eTFB, "1", 120, 0, 0),
+        ETFData(startDatePlus36monthsMinus1Day, eTFC, "1", 160, 1.75, 0),
+        ETFData(startDatePlus36monthsMinus1Day, eTFD, "1", 200, 0, 0)
       )
 
     val expectedQuantitiesQuarterly: Map[Int, Seq[FinalPortfolioQuantityToHave]] =
@@ -372,32 +373,28 @@ trait PortfolioFixture {
       )
 
 
-    val expectedRebalancedPortfolioQuarterly: Seq[ETFDataPlus] = investmentInputDataQuarterly.map { eTFData =>
+    val expectedRebalancedPortfolioQuarterly: Seq[ETFData] = investmentInputDataQuarterly.map { eTFData =>
       if (eTFData.asOfDate isBefore startDatePlus3months)
         eTFData.copy(
           quantity =
-            BigDecimal(expectedQuantitiesQuarterly(1).find(_.eTFCode == eTFData.eTFCode).map(_.quantity).getOrElse(0)),
-          cash = 9.0220
+            BigDecimal(expectedQuantitiesQuarterly(1).find(_.eTFCode == eTFData.eTFCode).map(_.quantity).getOrElse(0))
         )
       else if (eTFData.asOfDate isBefore startDatePlus6months)
         eTFData.copy(
           quantity =
-            BigDecimal(expectedQuantitiesQuarterly(2).find(_.eTFCode == eTFData.eTFCode).map(_.quantity).getOrElse(0)),
-          cash = 1.5259217860353611027869343721905
+            BigDecimal(expectedQuantitiesQuarterly(2).find(_.eTFCode == eTFData.eTFCode).map(_.quantity).getOrElse(0))
         )
       else if (eTFData.asOfDate isBefore startDatePlus9months)
         eTFData.copy(
           quantity =
-            BigDecimal(expectedQuantitiesQuarterly(3).find(_.eTFCode == eTFData.eTFCode).map(_.quantity).getOrElse(0)),
-          cash = 4.5557653581060833083608031165721
+            BigDecimal(expectedQuantitiesQuarterly(3).find(_.eTFCode == eTFData.eTFCode).map(_.quantity).getOrElse(0))
         )
       else
         eTFData.copy(
           quantity =
-            BigDecimal(expectedQuantitiesQuarterly(4).find(_.eTFCode == eTFData.eTFCode).map(_.quantity).getOrElse(0)),
-          cash = 1.1541624213365298172010788133061
+            BigDecimal(expectedQuantitiesQuarterly(4).find(_.eTFCode == eTFData.eTFCode).map(_.quantity).getOrElse(0))
         )
-                                                                                                  }
+    }
 
     val expectedQuantitiesSemiAnnually: Map[Int, Seq[FinalPortfolioQuantityToHave]] =
       Map(
@@ -439,42 +436,36 @@ trait PortfolioFixture {
         )
       )
 
-    val expectedRebalancedPortfolioSemiAnnually: Seq[ETFDataPlus] = investmentInputDataSemiAnnually.map { eTFData =>
+    val expectedRebalancedPortfolioSemiAnnually: Seq[ETFData] = investmentInputDataSemiAnnually.map { eTFData =>
       if (eTFData.asOfDate isBefore startDatePlus6months)
         eTFData.copy(
           quantity =
-            BigDecimal(expectedQuantitiesSemiAnnually(1).find(_.eTFCode == eTFData.eTFCode).map(_.quantity).getOrElse(0)),
-          cash = 9.0220
+            BigDecimal(expectedQuantitiesSemiAnnually(1).find(_.eTFCode == eTFData.eTFCode).map(_.quantity).getOrElse(0))
         )
       else if (eTFData.asOfDate isBefore startDatePlus12months)
         eTFData.copy(
           quantity =
-            BigDecimal(expectedQuantitiesSemiAnnually(2).find(_.eTFCode == eTFData.eTFCode).map(_.quantity).getOrElse(0)),
-          cash = 0.78929647387873339326740585356100
+            BigDecimal(expectedQuantitiesSemiAnnually(2).find(_.eTFCode == eTFData.eTFCode).map(_.quantity).getOrElse(0))
         )
       else if (eTFData.asOfDate isBefore startDatePlus18months)
         eTFData.copy(
           quantity =
-            BigDecimal(expectedQuantitiesSemiAnnually(3).find(_.eTFCode == eTFData.eTFCode).map(_.quantity).getOrElse(0)),
-          cash = 38.08031884926580761162721006892400
+            BigDecimal(expectedQuantitiesSemiAnnually(3).find(_.eTFCode == eTFData.eTFCode).map(_.quantity).getOrElse(0))
         )
       else if (eTFData.asOfDate isBefore startDatePlus24months)
         eTFData.copy(
           quantity =
-            BigDecimal(expectedQuantitiesSemiAnnually(4).find(_.eTFCode == eTFData.eTFCode).map(_.quantity).getOrElse(0)),
-          cash = 38.08031884926580761162721006892400
+            BigDecimal(expectedQuantitiesSemiAnnually(4).find(_.eTFCode == eTFData.eTFCode).map(_.quantity).getOrElse(0))
         )
       else if (eTFData.asOfDate isBefore startDatePlus30months)
         eTFData.copy(
           quantity =
-            BigDecimal(expectedQuantitiesSemiAnnually(5).find(_.eTFCode == eTFData.eTFCode).map(_.quantity).getOrElse(0)),
-          cash = 18.32419688342822894815702727000400
+            BigDecimal(expectedQuantitiesSemiAnnually(5).find(_.eTFCode == eTFData.eTFCode).map(_.quantity).getOrElse(0))
         )
       else
         eTFData.copy(
           quantity =
-            BigDecimal(expectedQuantitiesSemiAnnually(6).find(_.eTFCode == eTFData.eTFCode).map(_.quantity).getOrElse(0)),
-          cash = 2.51041084806712616122265507941400
+            BigDecimal(expectedQuantitiesSemiAnnually(6).find(_.eTFCode == eTFData.eTFCode).map(_.quantity).getOrElse(0))
         )
     }
   }

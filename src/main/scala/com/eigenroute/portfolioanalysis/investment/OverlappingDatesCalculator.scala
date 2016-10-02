@@ -1,17 +1,17 @@
 package com.eigenroute.portfolioanalysis.investment
 
-import com.eigenroute.portfolioanalysis.rebalancing.{ETFDataPlus, PortfolioDesign}
+import com.eigenroute.portfolioanalysis.rebalancing.{ETFData, PortfolioDesign}
 import org.joda.time.DateTime
 
 class OverlappingDatesCalculator(portfolioDesign: PortfolioDesign) {
 
-  def overlappingDates(eTFData: Seq[ETFDataPlus]): Seq[DateTime] = {
+  def overlappingDates(eTFData: Seq[ETFData]): Seq[DateTime] = {
     val eTFDatas =
       portfolioDesign.eTFSelections.map { selection => eTFData.filter(_.eTFCode == selection.eTFCode) }
     overlappingDatesFromSplitETFData(eTFDatas)
   }
 
-  def overlappingDatesFromSplitETFData(eTFDatas: Seq[Seq[ETFDataPlus]]): Seq[DateTime] = {
+  def overlappingDatesFromSplitETFData(eTFDatas: Seq[Seq[ETFData]]): Seq[DateTime] = {
     val datesForFirstETF: Seq[DateTime] =
       eTFDatas.headOption.map { eTFDatas => eTFDatas.map(eTFData => new DateTime(eTFData.asOfDate)) }.toSeq.flatten
 
@@ -20,7 +20,7 @@ class OverlappingDatesCalculator(portfolioDesign: PortfolioDesign) {
     }
   }
 
-  def eTFDataOnlyWithEntriesHavingOverlappingDates(eTFData: Seq[ETFDataPlus]): Seq[ETFDataPlus] = {
+  def eTFDataOnlyWithEntriesHavingOverlappingDates(eTFData: Seq[ETFData]): Seq[ETFData] = {
     val datesToRetain = overlappingDates(eTFData)
     eTFData.filter ( data => datesToRetain.contains(data.asOfDate) )
   }
