@@ -20,6 +20,7 @@ trait PortfolioFixture {
   val eTFCSelection = ETFSelection(eTFC, 0.1)
   val eTFDSelection = ETFSelection(eTFD, 0.15)
   val portfolioDesign = PortfolioDesign(Seq(eTFASelection, eTFBSelection, eTFCSelection, eTFDSelection))
+  val portfolioDesignOneETF = PortfolioDesign(Seq(eTFBSelection.copy(desiredWeight = 1)))
 
   val eTFDataPlusA = ETFData(now, eTFA, "1", 20, 0, 50)
   val eTFDataPlusB = ETFData(now, eTFB, "1", 30, 0, 100)
@@ -472,6 +473,7 @@ trait PortfolioFixture {
 
   trait PortfolioFiles {
     val portfolioDesignPath = new File("src/test/scala/com/eigenroute/portfolioanalysis/portfolioDesign.csv")
+    val portfolioDesignPathXSBOnly = new File("src/test/scala/com/eigenroute/portfolioanalysis/portfolioDesignXSBOnly.csv")
     val tempOutputFile = File.createTempFile("tempfile", ".xlsx")
     tempOutputFile.deleteOnExit()
   }

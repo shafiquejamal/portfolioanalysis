@@ -15,8 +15,10 @@ class LiquidatedValueCalculator {
       portfolioSnapshot
       .sameDateUniqueCodesETFDatas.map( eTFData => eTFData.quantity * eTFData.nAV/(1 + bidAskCostFractionOfNAV)).sum
 
-    eTFLiquidatedValue + accumulatedExDividends + accumulatedCash -
-      perETFTradingCost*portfolioSnapshot.sameDateUniqueCodesETFDatas.filterNot(_.quantity == 0).length
+    val totalTradingCosts = perETFTradingCost*portfolioSnapshot.sameDateUniqueCodesETFDatas.filterNot(_.quantity == 0).length
+
+    eTFLiquidatedValue + accumulatedExDividends + accumulatedCash - totalTradingCosts
+
   }
 
 }

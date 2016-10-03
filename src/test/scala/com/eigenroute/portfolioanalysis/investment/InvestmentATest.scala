@@ -6,6 +6,8 @@ import com.eigenroute.portfolioanalysis.rebalancing.{ETFData, FinalPortfolioQuan
 import org.joda.time.DateTime
 import org.scalatest.{FlatSpec, ShouldMatchers}
 
+import scala.util.{Try, Success}
+
 class InvestmentATest extends FlatSpec with ShouldMatchers with PortfolioFixture {
 
   "The number of rebalancing opportunities" should "be calculated as investment period in months divided by rebalancing " +
@@ -43,7 +45,7 @@ class InvestmentATest extends FlatSpec with ShouldMatchers with PortfolioFixture
     val investment =
       new Investment(
         investmentPeriodOneYear, Quarterly, 10040, 10, 0.0011, portfolioDesign, 0, investmentInputDataQuarterly)
-    val expectedRebalancedData = filterAndRound(expectedRebalancedPortfolioQuarterly, startDatePlus12months)
+    val expectedRebalancedData = filterBeforeEndDate(expectedRebalancedPortfolioQuarterly, startDatePlus12months)
     val rebalancedPortfolio = investment.rebalancePortfolio
     val actualRebalancedData = rebalancedPortfolio.rebalancedETFData
 
@@ -68,7 +70,7 @@ class InvestmentATest extends FlatSpec with ShouldMatchers with PortfolioFixture
     val investment =
       new Investment(
         investmentPeriodThreeYears, SemiAnnually, 10040, 10, 0.0011, portfolioDesign, 0.05, investmentInputDataSemiAnnually)
-    val expectedRebalancedData = filterAndRound(expectedRebalancedPortfolioSemiAnnually, startDatePlus36months)
+    val expectedRebalancedData = filterBeforeEndDate(expectedRebalancedPortfolioSemiAnnually, startDatePlus36months)
     val rebalancedPortfolio = investment.rebalancePortfolio
     val actualRebalancedData = rebalancedPortfolio.rebalancedETFData
 
@@ -86,6 +88,24 @@ class InvestmentATest extends FlatSpec with ShouldMatchers with PortfolioFixture
     round(rebalancedPortfolio.portfolioPerformance.averageAnnualReturnFraction, 11) shouldEqual round(1.140148678530547, 11)
   }
 
-  private def filterAndRound(eTFData: Seq[ETFData], endDate :DateTime) =
+  it should "not throw any exceptions when the portfolio design contains just one ETF" in new InvestmentFixture {
+
+    val investmentPeriodThreeYears = InvestmentPeriod(startDate, startDate.plusYears(3))
+    val investment =
+      new Investment(
+        investmentPeriodThreeYears,
+        SemiAnnually,
+        10010,
+        10,
+        0.0011,
+        portfolioDesignOneETF,
+        0.50,
+        investmentInputDataSemiAnnually.filter(_.eTFCode == eTFB))
+
+    Try(investment.rebalancePortfolio) shouldBe a[Success[_]]
+
+  }
+
+  private def filterBeforeEndDate(eTFData: Seq[ETFData], endDate :DateTime) =
     eTFData.filter { eTFData => eTFData.asOfDate.isBefore(endDate)}
 }
