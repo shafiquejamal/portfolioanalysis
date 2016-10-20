@@ -20,5 +20,4 @@ class PortfolioQuantitiesToAcquireUTest extends FlatSpec with ShouldMatchers wit
     portfolioQuantitiesToAcquire + quantitiesToAdd shouldEqual expected
   }
 
-
 }
